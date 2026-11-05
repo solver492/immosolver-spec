@@ -1,0 +1,1716 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>ImmoSolver — Spécification fonctionnelle & technique</title>
+<meta name="author" content="ImmoSolver" />
+<meta name="description" content="Spécification fonctionnelle et technique du CRM immobilier ImmoSolver — location et vente." />
+<style>
+  @page { size: A4; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Nimbus Sans", "DejaVu Sans", Arial, sans-serif;
+    font-size: 9.4pt; line-height: 1.5; color: #1d2939;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  p { margin: 0 0 7pt; }
+  strong { color: #0b1b33; }
+  a { color: #0d6b86; text-decoration: none; }
+  em { color: #334155; }
+  .mono { font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; }
+  .muted { color: #64748b; }
+  .small { font-size: 8.2pt; line-height: 1.45; }
+  .center { text-align: center; }
+
+  /* ---------- COUVERTURE ---------- */
+  .cover {
+    page-break-after: always; position: relative; overflow: hidden;
+    background: linear-gradient(155deg, #06101e 0%, #0a1a30 48%, #0b2338 100%);
+    color: #eaf2fb; border-radius: 5px; padding: 30px 32px 24px; height: 258mm;
+  }
+  .cover::before {
+    content: ""; position: absolute; top: -160px; right: -150px;
+    width: 460px; height: 460px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(60,224,255,.32), transparent 63%);
+  }
+  .cover::after {
+    content: ""; position: absolute; bottom: -190px; left: -140px;
+    width: 430px; height: 430px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(246,196,83,.20), transparent 63%);
+  }
+  .cover-top { display: flex; align-items: center; gap: 11px; position: relative; z-index: 2; }
+  .mark {
+    width: 40px; height: 40px; border-radius: 11px; text-align: center; line-height: 40px;
+    font-weight: 800; font-size: 19pt; color: #06131f;
+    background: linear-gradient(135deg, #8af3ff, #3ce0ff 52%, #f6c453 135%);
+  }
+  .brand-name { font-size: 12pt; font-weight: 800; letter-spacing: .18em; }
+  .brand-sub { font-size: 6.6pt; letter-spacing: .32em; color: #7e93ad; text-transform: uppercase; margin-top: 2px; }
+  .cover-mid { position: relative; z-index: 2; margin-top: 46px; }
+  .cover-kicker {
+    display: inline-block; border: 1px solid rgba(60,224,255,.3); background: rgba(60,224,255,.07);
+    color: #9ff0ff; font-size: 7pt; letter-spacing: .22em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 999px; margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-family: "C059", "DejaVu Serif", Georgia, serif;
+    font-size: 31pt; line-height: 1.12; font-weight: bold; margin: 0 0 14px; letter-spacing: -.01em;
+  }
+  .cover h1 span { color: #3ce0ff; }
+  .cover .sub {
+    font-size: 12pt; color: #b9c9dc; line-height: 1.45; max-width: 132mm; margin-bottom: 8px;
+  }
+  .cover .sub2 { font-size: 9pt; color: #8ea3ba; max-width: 136mm; }
+  .cover-rule { height: 1px; background: linear-gradient(90deg, rgba(60,224,255,.7), rgba(255,255,255,.05)); margin: 26px 0 20px; position: relative; z-index: 2; }
+  .cover-meta { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; max-width: 148mm; }
+  .cover-meta .k { font-size: 6.8pt; letter-spacing: .2em; text-transform: uppercase; color: #6f87a1; margin-bottom: 2px; }
+  .cover-meta .v { font-size: 9.4pt; color: #dbe7f4; }
+  .cover-bottom {
+    position: absolute; left: 32px; right: 32px; bottom: 22px; z-index: 2;
+    border-top: 1px solid rgba(255,255,255,.1); padding-top: 12px;
+    display: flex; justify-content: space-between; font-size: 7.4pt; color: #7f95ae;
+  }
+  .cover-bottom strong { color: #cfe2f5; }
+
+  /* ---------- TITRES ---------- */
+  h2.sec {
+    page-break-before: always; font-family: "C059", "DejaVu Serif", Georgia, serif;
+    font-size: 19pt; line-height: 1.2; color: #0b1b33; margin: 0 0 4px; font-weight: bold;
+  }
+  .sec-kicker {
+    font-size: 7pt; letter-spacing: .24em; text-transform: uppercase; color: #0d7c9b;
+    font-weight: bold; margin-bottom: 4px;
+  }
+  .sec-head { border-bottom: 2px solid #e3eaf3; padding-bottom: 10px; margin-bottom: 16px; }
+  .sec-head .abstract { font-size: 9.6pt; color: #55657a; margin-top: 7px; max-width: 165mm; }
+  h3 { font-size: 11.6pt; color: #0b1b33; margin: 16px 0 6px; font-weight: bold; break-after: avoid; }
+  h4 { font-size: 9.6pt; color: #12304f; margin: 11px 0 4px; font-weight: bold; letter-spacing: .01em; break-after: avoid; }
+  h3 .n, h4 .n { color: #0d7c9b; margin-right: 5px; }
+
+  /* ---------- BLOCS ---------- */
+  .lead { font-size: 10.6pt; line-height: 1.55; color: #334155; }
+  .kpis { break-inside: avoid; display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin: 10px 0 12px; }
+  .kpi { border: 1px solid #e0e7f0; border-radius: 4px; padding: 9px 10px; background: #f8fafc; break-inside: avoid; }
+  .kpi .n { font-family: "C059", Georgia, serif; font-size: 16pt; font-weight: bold; color: #0b1b33; line-height: 1.1; }
+  .kpi .l { font-size: 7.4pt; color: #64748b; margin-top: 2px; line-height: 1.3; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+  .card { border: 1px solid #e0e7f0; border-radius: 4px; padding: 10px 12px; background: #fff; break-inside: avoid; }
+  .card h4 { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .callout, .warn, .ok {
+    border-left: 3px solid #0d7c9b; background: #f2f8fb; padding: 9px 12px;
+    font-size: 8.8pt; color: #334155; margin: 10px 0; break-inside: avoid;
+  }
+  .warn { border-color: #c2740a; background: #fdf7ec; }
+  .ok { border-color: #178a63; background: #f0faf6; }
+  .callout strong, .warn strong, .ok strong { color: #0b1b33; }
+  .callout .t, .warn .t, .ok .t { display: block; font-size: 7pt; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 3px; color: #0d7c9b; }
+  .warn .t { color: #a35f08; } .ok .t { color: #137a58; }
+
+  /* ---------- TABLEAUX ---------- */
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 8.3pt; margin: 8px 0 12px; }
+  table.tbl th {
+    background: #0f2a45; color: #e8f1fa; text-align: left; font-size: 7.2pt;
+    letter-spacing: .09em; text-transform: uppercase; padding: 6px 7px; font-weight: bold;
+  }
+  table.tbl td { border-bottom: 1px solid #e3eaf3; padding: 5.5px 7px; vertical-align: top; color: #334155; }
+  table.tbl tr:nth-child(even) td { background: #f8fafc; }
+  table.tbl td strong { color: #0b1b33; }
+  table.tbl .mono { font-size: 7.4pt; }
+  table.tbl.compact td, table.tbl.compact th { padding: 4px 6px; }
+  table.tbl thead { display: table-header-group; }
+  table.tbl tr { break-inside: avoid; }
+
+  /* ---------- FIGURES ---------- */
+  .fig { margin: 10px 0 12px; break-inside: avoid; }
+  .fig img { width: 100%; border: 1px solid #cfd9e6; border-radius: 4px; display: block; }
+  .figcap { font-size: 7.3pt; color: #64748b; margin-top: 4px; display: flex; justify-content: space-between; gap: 10px; }
+  .figcap .r { font-family: "DejaVu Sans Mono", monospace; font-size: 6.9pt; color: #7c8ca1; }
+
+  /* ---------- MODULES ---------- */
+  .mod-head {
+    border: 1px solid #dce5ef; border-left: 4px solid #0d7c9b; border-radius: 3px;
+    padding: 10px 13px; background: linear-gradient(100deg, #f4f9fc, #ffffff 70%);
+    margin: 12px 0 10px; break-inside: avoid; break-after: avoid;
+  }
+  .mod-head.pb { page-break-before: always; }
+  .mod-head .id { font-family: "DejaVu Sans Mono", monospace; font-size: 7pt; letter-spacing: .18em; color: #0d7c9b; }
+  .mod-head h3 { margin: 2px 0 2px; font-family: "C059", Georgia, serif; font-size: 15pt; }
+  .mod-head .tagline { font-size: 8.6pt; color: #64748b; font-style: italic; }
+  .tags { margin: 5px 0 0; }
+  .tag {
+    display: inline-block; font-size: 6.6pt; letter-spacing: .07em; text-transform: uppercase;
+    border: 1px solid #d3dfec; border-radius: 3px; padding: 1.5px 5px; margin: 0 2px 2px 0; color: #4b5f77; background: #fff;
+  }
+  .tag.cy { border-color: #a7dcea; background: #eefafe; color: #0b6b87; }
+  .tag.am { border-color: #ecd49e; background: #fdf8ec; color: #96630c; }
+  .tag.em { border-color: #a9ddc9; background: #effaf5; color: #127a58; }
+  .tag.ro { border-color: #f0c0cb; background: #fdf0f3; color: #a83a55; }
+  ul.ticks, ul.cross { list-style: none; padding: 0; margin: 4px 0 8px; }
+  ul.ticks li, ul.cross li { position: relative; padding-left: 13px; margin-bottom: 3.2px; font-size: 8.7pt; color: #334155; }
+  ul.ticks li::before { content: "▪"; position: absolute; left: 0; top: -1px; color: #0d7c9b; font-size: 9pt; }
+  ul.cross li::before { content: "×"; position: absolute; left: 0; top: -1px; color: #b4495f; font-weight: bold; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .duo h4 { margin-top: 2px; }
+  .verdict { break-inside: avoid; font-size: 8.2pt; color: #475569; border-top: 1px dashed #dbe4ef; padding-top: 6px; margin-top: 6px; }
+  .verdict strong { color: #0b1b33; }
+
+  /* ---------- SOMMAIRE ---------- */
+  .toc { margin-top: 6px; }
+  .toc-row { display: grid; grid-template-columns: 12mm 1fr auto; gap: 4px; padding: 4.2px 0; border-bottom: 1px dotted #dbe4ef; font-size: 9pt; }
+  .toc-row .num { font-family: "DejaVu Sans Mono", monospace; color: #0d7c9b; font-size: 8pt; }
+  .toc-row .sub { color: #64748b; font-size: 7.6pt; display: block; margin-top: 1px; }
+  .toc-row .flag { font-size: 7pt; color: #94a3b8; }
+  .toc-part { margin: 12px 0 3px; font-size: 7pt; letter-spacing: .22em; text-transform: uppercase; color: #94a3b8; }
+
+  /* ---------- DIVERS ---------- */
+  .flow { break-inside: avoid; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0 12px; }
+  .step { border: 1px solid #e0e7f0; border-radius: 3px; padding: 7px 8px; background: #fbfdff; break-inside: avoid; }
+  .step .n { font-family: "DejaVu Sans Mono", monospace; font-size: 6.8pt; color: #0d7c9b; letter-spacing: .1em; }
+  .step .t { font-size: 8pt; font-weight: bold; color: #0b1b33; margin: 2px 0; }
+  .step .d { font-size: 7.2pt; color: #64748b; line-height: 1.35; }
+  .diagram { border: 1px solid #dce5ef; border-radius: 4px; padding: 10px 12px; background: #f9fbfd; margin: 8px 0 12px; break-inside: avoid; }
+  .layer { display: grid; grid-template-columns: 26mm 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px dashed #dde6f0; align-items: start; }
+  .layer:last-child { border-bottom: none; }
+  .layer .k { font-size: 6.8pt; letter-spacing: .12em; text-transform: uppercase; color: #7c8ca1; padding-top: 3px; }
+  .layer .v { font-size: 8.2pt; color: #334155; }
+  .pill { display: inline-block; border: 1px solid #d3dfec; background: #fff; border-radius: 3px; padding: 1.5px 5px; margin: 0 2px 2px 0; font-size: 7.2pt; }
+  .pill.hi { border-color: #9fd8e8; background: #effafe; color: #0b6b87; }
+  .pill.wa { border-color: #ecd49e; background: #fdf8ec; color: #8a5a08; }
+  .note { font-size: 7.6pt; color: #7c8ca1; }
+  .pagebreak { page-break-before: always; }
+  .avoid { break-inside: avoid; }
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gallery figure { margin: 0; break-inside: avoid; }
+  .gallery img { width: 100%; border: 1px solid #cfd9e6; border-radius: 3px; display: block; }
+  .gallery figcaption { font-size: 6.9pt; color: #64748b; margin-top: 2px; }
+  .kv { display: grid; grid-template-columns: 44mm 1fr; gap: 2px 8px; font-size: 8.6pt; }
+  .kv .k { color: #64748b; }
+  .kv .v { color: #0b1b33; }
+  .sig { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 8pt; color: #64748b; }
+  .sig .line { border-top: 1px solid #94a3b8; padding-top: 4px; margin-top: 24px; }
+  .code {
+    font-family: "DejaVu Sans Mono", monospace; font-size: 7.4pt; background: #0f1c2e; color: #d7e6f5;
+    padding: 9px 11px; border-radius: 3px; white-space: pre-wrap; line-height: 1.45; margin: 7px 0 10px;
+  }
+  .code .c { color: #7f9bb8; }
+  .chk { list-style: none; padding: 0; margin: 4px 0; }
+  .chk li { position: relative; padding-left: 16px; margin-bottom: 3px; font-size: 8.5pt; }
+  .chk li::before { content: "☐"; position: absolute; left: 0; top: -1px; color: #0d7c9b; }
+</style>
+</head>
+<body>
+
+<!-- ============================ COUVERTURE ============================ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="mark">I</div>
+    <div>
+      <div class="brand-name">IMMOSOLVER</div>
+      <div class="brand-sub">Property Operating System</div>
+    </div>
+  </div>
+
+  <div class="cover-mid">
+    <div class="cover-kicker">Spécification produit · Édition 2026</div>
+    <h1>CRM immobilier<br /><span>location &amp; vente</span></h1>
+    <p class="sub">Spécification fonctionnelle et technique complète — analyse module par module, modèle de données, architecture, sécurité, maturité et feuille de route.</p>
+    <p class="sub2">Document de référence pour la réalisation de la vidéo de démonstration et l'intégration du produit.</p>
+  </div>
+
+  <div class="cover-rule"></div>
+
+  <div class="cover-meta">
+    <div><div class="k">Version du document</div><div class="v">1.0 — finale</div></div>
+    <div><div class="k">Date</div><div class="v">5 novembre 2026</div></div>
+    <div><div class="k">Application déployée</div><div class="v">https://immosolver.store/</div></div>
+    <div><div class="k">Dossier produit</div><div class="v">https://immosolver.store/descriptif/</div></div>
+    <div><div class="k">Périmètre</div><div class="v">Gestion locative et transaction vente — Maroc</div></div>
+    <div><div class="k">Diffusion</div><div class="v">Interne · direction, produit, développement</div></div>
+  </div>
+
+  <div class="cover-bottom">
+    <div><strong>immosolver.store</strong> — document généré à partir du code source déployé</div>
+    <div>84 fichiers · 10 647 lignes · 10 modules</div>
+  </div>
+</div>
+
+<!-- ============================ SOMMAIRE ============================ -->
+<h2 class="sec" style="page-break-before:avoid">Sommaire</h2>
+<div class="sec-head">
+  <div class="abstract">Seize chapitres, de la vision produit au guide d'intégration de la vidéo. Les chapitres 05 et 07 constituent le cœur de la spécification fonctionnelle.</div>
+</div>
+
+<div class="toc">
+  <div class="toc-part">Comprendre le produit</div>
+  <div class="toc-row"><span class="num">01</span><span>Résumé exécutif<span class="sub">Fiche d'identité, chiffres clés, périmètre réel, ce que le produit fait et ne fait pas</span></span><span class="flag">Stratégie</span></div>
+  <div class="toc-row"><span class="num">02</span><span>Contexte et problème métier<span class="sub">Douleurs terrain, promesse, principes de conception</span></span><span class="flag">Stratégie</span></div>
+  <div class="toc-row"><span class="num">03</span><span>Utilisateurs et rôles<span class="sub">Personas, matrice des droits théorique et réalité de l'accès</span></span><span class="flag">Produit</span></div>
+  <div class="toc-row"><span class="num">04</span><span>Cartographie fonctionnelle<span class="sub">Les 10 modules, la navigation contextuelle, le cycle de vie de la donnée</span></span><span class="flag">Produit</span></div>
+
+  <div class="toc-part">Spécification fonctionnelle</div>
+  <div class="toc-row"><span class="num">05</span><span>Analyse module par module<span class="sub">10 modules : objectif, fonctions, dictionnaire de données, règles, limites</span></span><span class="flag">Cœur</span></div>
+  <div class="toc-row"><span class="num">06</span><span>Parcours utilisateurs<span class="sub">Agent commercial, gestionnaire locatif, direction, mise en route</span></span><span class="flag">Cœur</span></div>
+  <div class="toc-row"><span class="num">07</span><span>Modèle de données<span class="sub">8 entités, dictionnaires de champs, stores, persistance, anomalies</span></span><span class="flag">Cœur</span></div>
+
+  <div class="toc-part">Spécification technique</div>
+  <div class="toc-row"><span class="num">08</span><span>Architecture technique<span class="sub">Couches, stack, volumétrie, build, routage, performance</span></span><span class="flag">Technique</span></div>
+  <div class="toc-row"><span class="num">09</span><span>Design system<span class="sub">Tokens, typographie, composants, états, responsive, accessibilité</span></span><span class="flag">Design</span></div>
+  <div class="toc-row"><span class="num">10</span><span>Internationalisation et RTL<span class="sub">Français / arabe, 16 namespaces, bascule de direction</span></span><span class="flag">Technique</span></div>
+  <div class="toc-row"><span class="num">11</span><span>Sécurité, données et conformité<span class="sub">Surface d'attaque, risques, loi 09-08, valeur de la signature</span></span><span class="flag">Risque</span></div>
+
+  <div class="toc-part">Décider et exploiter</div>
+  <div class="toc-row"><span class="num">12</span><span>Audit de maturité<span class="sub">Notation par module, dette technique, qualité du code</span></span><span class="flag">Audit</span></div>
+  <div class="toc-row"><span class="num">13</span><span>Feuille de route<span class="sub">3 phases, livrables, critères d'acceptation, choix d'architecture</span></span><span class="flag">Plan</span></div>
+  <div class="toc-row"><span class="num">14</span><span>Exploitation et déploiement<span class="sub">Hébergement, procédures, sauvegarde, checklist de mise en production</span></span><span class="flag">Ops</span></div>
+  <div class="toc-row"><span class="num">15</span><span>Guide d'intégration vidéo<span class="sub">Spécifications, iframe, storyboard 12 plans, script voix off</span></span><span class="flag">Production</span></div>
+  <div class="toc-row"><span class="num">16</span><span>Annexes<span class="sub">Routes, dépendances, 14 captures, glossaire, traçabilité</span></span><span class="flag">Référence</span></div>
+</div>
+
+<div class="callout" style="margin-top:18px">
+  <span class="t">Conventions de lecture</span>
+  Les montants sont exprimés en dirhams marocains (MAD). Les chemins commençant par <span class="mono">/</span> désignent des routes de l'application. Les statuts « Complet », « Fonctionnel », « Partiel » et « Phase 2 » sont définis au chapitre 12. Les captures d'écran proviennent de la version effectivement déployée le 5 novembre 2026.
+</div>
+
+<!-- ============================ 01 RESUME ============================ -->
+<h2 class="sec">01 · Résumé exécutif</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Vue d'ensemble</div>
+  <div class="abstract">ImmoSolver est un poste de pilotage pour agence immobilière, couvrant la location et la vente dans une interface unique, bilingue français / arabe, déployée en statique sur immosolver.store.</div>
+</div>
+
+<h3><span class="n">1.1</span>Fiche d'identité du produit</h3>
+<table class="tbl">
+  <tbody>
+    <tr><td style="width:34%"><strong>Nom affiché dans l'application</strong></td><td>immohaus — CRM Immobilier Premium</td></tr>
+    <tr><td><strong>Marque exploitante</strong></td><td>TERRE &amp; MER MAROC (sidebar et profil administrateur)</td></tr>
+    <tr><td><strong>Nom du dossier et du domaine</strong></td><td>ImmoSolver — <span class="mono">immosolver.store</span></td></tr>
+    <tr><td><strong>Nature</strong></td><td>Application web mono-page (SPA), 100 % front-end</td></tr>
+    <tr><td><strong>Métier couvert</strong></td><td>Gestion locative, recouvrement des loyers, maintenance, transaction vente, qualification de leads</td></tr>
+    <tr><td><strong>Marché cible</strong></td><td>Agences immobilières indépendantes au Maroc — jeu de données et zones centrés sur Tanger</td></tr>
+    <tr><td><strong>Langues</strong></td><td>Français (défaut) et arabe, avec bascule complète en direction RTL</td></tr>
+    <tr><td><strong>Stack</strong></td><td>React 19.1 · TypeScript 5.8 · Vite 6.3 · TanStack Router 1.121 · Tailwind CSS 4.2 · Zustand 5 · Recharts 2.15 · FullCalendar 6.1</td></tr>
+    <tr><td><strong>Hébergement</strong></td><td>Hostinger — hébergement statique, HTTPS, domaine <span class="mono">immosolver.store</span></td></tr>
+    <tr><td><strong>Persistance</strong></td><td><span class="mono">localStorage</span> pour le mode, le thème et les notifications ; état métier en mémoire et store non persisté</td></tr>
+    <tr><td><strong>Authentification</strong></td><td>Aucune — profil « Adil M. · Administrateur » décoratif</td></tr>
+    <tr><td><strong>Base de données</strong></td><td>Aucune. Client Supabase généré mais importé nulle part</td></tr>
+    <tr><td><strong>Intégrations</strong></td><td>WhatsApp par liens <span class="mono">wa.me</span>, webhook Zapier optionnel, embeds YouTube / Vimeo, photos Unsplash (démonstration)</td></tr>
+    <tr><td><strong>Volumétrie</strong></td><td>84 fichiers source · 10 647 lignes · 10 modules · 9 écrans · 46 composants d'interface</td></tr>
+    <tr><td><strong>État</strong></td><td>Démonstrateur avancé et crédible — prêt pour la démonstration, non prêt pour une exploitation réelle sans socle serveur</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">1.2</span>Chiffres clés</h3>
+<div class="kpis">
+  <div class="kpi"><div class="n">10</div><div class="l">modules fonctionnels documentés</div></div>
+  <div class="kpi"><div class="n">9</div><div class="l">écrans accessibles par route</div></div>
+  <div class="kpi"><div class="n">46</div><div class="l">composants d'interface réutilisables</div></div>
+  <div class="kpi"><div class="n">2</div><div class="l">langues, dont l'arabe en RTL natif</div></div>
+  <div class="kpi"><div class="n">1,33 Mo</div><div class="l">bundle JavaScript (382 Ko compressé)</div></div>
+  <div class="kpi"><div class="n">0</div><div class="l">serveur, API ou base à opérer</div></div>
+</div>
+
+<h3><span class="n">1.3</span>Ce que le produit fait — et ce qu'il ne fait pas</h3>
+<div class="grid2">
+  <div class="card">
+    <h4 style="color:#127a58">Périmètre réellement livré</h4>
+    <ul class="ticks">
+      <li>Créer, rechercher, éditer et supprimer des biens avec photos et vidéo.</li>
+      <li>Gérer des locataires avec identité, CIN, contact d'urgence et score.</li>
+      <li>Suivre les loyers, les impayés et relancer par WhatsApp.</li>
+      <li>Générer quatre types de contrats et les signer à l'écran.</li>
+      <li>Suivre les tickets de maintenance et les rappels de charges.</li>
+      <li>Qualifier des leads et les publier au portefeuille en un clic.</li>
+      <li>Basculer toute l'application entre location et vente.</li>
+      <li>Travailler en français ou en arabe, en mode nuit ou jour.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4 style="color:#a83a55">Hors périmètre de cette version</h4>
+    <ul class="cross">
+      <li>Authentification, rôles et cloisonnement des données.</li>
+      <li>Persistance serveur, sauvegarde et travail multi-appareils.</li>
+      <li>Vitrine publique : écran d'attente « Phase 2 » uniquement.</li>
+      <li>Réception automatique des messages WhatsApp (API Meta).</li>
+      <li>Quittances PDF, envoi de contrats par e-mail, signature qualifiée.</li>
+      <li>Coût par lead, ROI publicitaire et attribution de campagne.</li>
+      <li>Comptabilité, rapprochement bancaire, multi-agences.</li>
+      <li>Tests automatisés, intégration continue et supervision.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout">
+  <span class="t">Lecture honnête</span>
+  La valeur démontrée est réelle : les flux principaux fonctionnent, l'interface est aboutie et le produit raconte une histoire crédible à un dirigeant d'agence. Mais l'application ne conserve pas les données métier au-delà de la session et n'identifie pas ses utilisateurs. Toute mise en production réelle exige le socle décrit au chapitre 13.
+</div>
+
+<!-- ============================ 02 CONTEXTE ============================ -->
+<h2 class="sec">02 · Contexte et problème métier</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Pourquoi ce produit existe</div>
+  <div class="abstract">Les agences immobilières de taille moyenne gèrent souvent deux métiers — la location et la vente — avec les mêmes outils improvisés : WhatsApp, Excel, des dossiers partagés et la mémoire du gérant.</div>
+</div>
+
+<h3><span class="n">2.1</span>Le terrain</h3>
+<p>Une agence type à Tanger réunit trois à dix agents, un gestionnaire locatif et un dirigeant. Elle suit simultanément des biens à louer, des biens à vendre, des propriétaires bailleurs, des candidats locataires, des acquéreurs et des prestataires. Les annonces arrivent par WhatsApp, les visites se planifient par téléphone, les loyers se vérifient sur des relevés bancaires et les contrats s'impriment chez le notaire ou dans un cabinet.</p>
+<p>Le résultat est prévisible : l'information est fragmentée, les relances dépendent de la mémoire, les leads refroidissent et le dirigeant ne dispose d'aucune vue consolidée sans demander un tableau à quelqu'un. Le problème n'est pas l'absence de logiciel — c'est que les logiciels existants sont soit comptables, soit américains, soit trop lourds pour une agence de terrain.</p>
+
+<h3><span class="n">2.2</span>Cinq douleurs, cinq réponses</h3>
+<table class="tbl">
+  <thead><tr><th style="width:31%">Douleur observée</th><th style="width:36%">Conséquence opérationnelle</th><th>Réponse dans ImmoSolver</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Biens dispersés</strong> entre WhatsApp, Excel et la boîte mail</td><td>Doubles saisies, annonces obsolètes, impossibilité de répondre vite à un client</td><td>Portefeuille unique, recherchable, avec photos, vidéo, statut et référence stable</td></tr>
+    <tr><td><strong>Loyers suivis de mémoire</strong></td><td>Retards détectés trop tard, impayés qui s'accumulent, relation dégradée</td><td>Statuts de paiement, totaux attendus / perçus / restants, relance WhatsApp contextualisée</td></tr>
+    <tr><td><strong>Contrats imprimés puis scannés</strong></td><td>Allers-retours, signatures manquantes, archivage approximatif</td><td>Quatre modèles de contrats, signature au doigt ou au stylet, aperçu imprimable</td></tr>
+    <tr><td><strong>Leads perdus</strong> dans les conversations</td><td>Opportunités non qualifiées, mandats manqués</td><td>Le Radar : file d'entrée, aperçu, publication au portefeuille ou rejet motivé</td></tr>
+    <tr><td><strong>Maintenance non tracée</strong></td><td>Coûts subis, prestataires non comparés, propriétaires mécontents</td><td>Tickets catégorisés, priorités, prestataire, coût, rappels de charges</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">2.3</span>La promesse</h3>
+<p class="lead">« Une agence immobilière tient dans un onglet. » La promesse n'est pas d'automatiser le métier, mais de réunir dans un même geste ce qui est aujourd'hui éparpillé : le bien, le client, le contrat, le loyer et l'incident. Le produit ne remplace ni le notaire, ni le comptable, ni le terrain — il remplace la dispersion.</p>
+
+<h3><span class="n">2.4</span>Cinq principes de conception</h3>
+<div class="grid3">
+  <div class="card"><h4>Un seul modèle de biens</h4><p class="small">La location et la vente partagent la même base. Le mode change le vocabulaire, la navigation et les contrats — jamais les données.</p></div>
+  <div class="card"><h4>Le geste avant l'écran</h4><p class="small">Chaque écran répond à une action concrète : publier un bien, relancer un loyer, signer un bail, clôturer un ticket.</p></div>
+  <div class="card"><h4>La densité maîtrisée</h4><p class="small">Beaucoup d'information, mais une hiérarchie claire : indicateurs, puis liste, puis fiche. Jamais de tableau inextricable.</p></div>
+  <div class="card"><h4>Le terrain d'abord</h4><p class="small">Zones réelles, MAD, CIN, WhatsApp, prénoms et usages marocains. Le produit n'est pas un template traduit.</p></div>
+  <div class="card"><h4>Zéro infrastructure</h4><p class="small">Un build statique, un CDN, un domaine. Coût d'exploitation quasi nul et déploiement en quelques secondes.</p></div>
+  <div class="card"><h4>L'honnêteté produit</h4><p class="small">Les fonctions inachevées sont assumées : la vitrine annonce « Phase 2 », la signature n'est pas survendue comme qualifiée.</p></div>
+</div>
+
+<!-- ============================ 03 UTILISATEURS ============================ -->
+<h2 class="sec">03 · Utilisateurs et rôles</h2>
+<div class="sec-head">
+  <div class="sec-kicker">À qui le produit s'adresse</div>
+  <div class="abstract">Quatre profils utilisent ou subissent l'outil. Dans la version actuelle, ils partagent exactement les mêmes droits — ce qui est acceptable en démonstration et inacceptable en production.</div>
+</div>
+
+<h3><span class="n">3.1</span>Personas</h3>
+<table class="tbl">
+  <thead><tr><th style="width:17%">Persona</th><th style="width:21%">Objectif principal</th><th style="width:26%">Ce qu'il fait dans l'outil</th><th>Ce qu'il attend</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Agent commercial</strong><br /><span class="small muted">Yassine, 29 ans</span></td><td>Transformer un contact en mandat puis en vente ou location</td><td>Radar, portefeuille, fiche bien, contrats de vente, agenda</td><td>Saisir vite depuis le téléphone, retrouver un bien en deux secondes, ne pas perdre un lead</td></tr>
+    <tr><td><strong>Gestionnaire locatif</strong><br /><span class="small muted">Salma, 36 ans</span></td><td>Encaisser les loyers et traiter les incidents</td><td>Paiements, locataires, maintenance, rappels de charges</td><td>Voir les impayés du mois, relancer sans rédiger, savoir quel prestataire est intervenu</td></tr>
+    <tr><td><strong>Dirigeant d'agence</strong><br /><span class="small muted">Adil, 45 ans</span></td><td>Piloter l'activité sans attendre un reporting</td><td>Tableau de bord, analytique, contrats, portefeuille</td><td>Une vue fiable du chiffre, des zones faibles et des contrats à renouveler</td></tr>
+    <tr><td><strong>Propriétaire bailleur</strong><br /><span class="small muted">M. El Idrissi</span></td><td>Savoir que son bien est suivi et que son loyer est encaissé</td><td>Indirectement — via les documents et messages de l'agence</td><td>De la transparence sur les loyers, les charges et les interventions</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">3.2</span>Matrice des droits : théorie et réalité</h3>
+<table class="tbl">
+  <thead><tr><th>Capacité</th><th>Agent</th><th>Gestionnaire</th><th>Dirigeant</th><th>État réel dans l'application</th></tr></thead>
+  <tbody>
+    <tr><td>Consulter le portefeuille</td><td>Oui</td><td>Oui</td><td>Oui</td><td><span class="tag ro">Ouvert à tous</span></td></tr>
+    <tr><td>Créer / modifier un bien</td><td>Oui</td><td>Non</td><td>Oui</td><td><span class="tag ro">Ouvert à tous</span></td></tr>
+    <tr><td>Voir les données personnelles (CIN)</td><td>Limité</td><td>Oui</td><td>Oui</td><td><span class="tag ro">Ouvert à tous</span></td></tr>
+    <tr><td>Encaisser / marquer un loyer payé</td><td>Non</td><td>Oui</td><td>Oui</td><td><span class="tag ro">Ouvert à tous</span></td></tr>
+    <tr><td>Signer un contrat</td><td>Oui</td><td>Oui</td><td>Oui</td><td><span class="tag ro">Ouvert à tous</span></td></tr>
+    <tr><td>Supprimer un bien ou un locataire</td><td>Non</td><td>Non</td><td>Oui</td><td><span class="tag ro">Ouvert à tous</span></td></tr>
+    <tr><td>Accéder à l'analytique et aux marges</td><td>Non</td><td>Non</td><td>Oui</td><td><span class="tag ro">Ouvert à tous</span></td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  <span class="t">Constat de sécurité</span>
+  Il n'existe ni écran de connexion, ni jeton de session, ni contrôle de rôle. Le profil affiché en bas de la sidebar est une maquette. Toute personne disposant de l'URL accède à l'intégralité des écrans et des données de démonstration. La matrice ci-dessus décrit donc l'intention produit, pas le comportement du logiciel.
+</div>
+
+<div class="callout">
+  <span class="t">Conséquence pour la démonstration vidéo</span>
+  Il est possible de montrer le produit comme un outil d'équipe, mais il ne faut pas affirmer qu'il « sécurise les accès » ou « cloisonne les rôles ». La vidéo doit vendre ce qui existe : la fluidité, la couverture fonctionnelle et la qualité d'interface.
+</div>
+
+<!-- ============================ 04 CARTOGRAPHIE ============================ -->
+<h2 class="sec">04 · Cartographie fonctionnelle</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Vue système</div>
+  <div class="abstract">Dix modules, neuf routes, deux modes. La navigation est recomposée à la volée selon le mode actif : c'est le mécanisme central qui permet de servir deux métiers sans dupliquer le produit.</div>
+</div>
+
+<h3><span class="n">4.1</span>Les dix modules</h3>
+<table class="tbl">
+  <thead><tr><th style="width:5%">#</th><th style="width:21%">Module</th><th style="width:16%">Route</th><th style="width:13%">Mode</th><th style="width:15%">Maturité</th><th>Dépend de</th></tr></thead>
+  <tbody>
+    <tr><td>01</td><td><strong>Tableau de bord</strong></td><td class="mono">/</td><td>Les deux</td><td><span class="tag em">Complet</span></td><td>Agenda, graphiques, KPI</td></tr>
+    <tr><td>02</td><td><strong>Portefeuille de biens</strong></td><td class="mono">/portefeuille</td><td>Les deux</td><td><span class="tag em">Complet</span></td><td>Store portefeuille, photos, vidéo</td></tr>
+    <tr><td>03</td><td><strong>Fiche bien et médias</strong></td><td class="mono">/portefeuille</td><td>Les deux</td><td><span class="tag em">Complet</span></td><td>Module 02</td></tr>
+    <tr><td>04</td><td><strong>Locataires et clients</strong></td><td class="mono">/locataires</td><td>Location</td><td><span class="tag em">Complet</span></td><td>État local, formulaire dédié</td></tr>
+    <tr><td>05</td><td><strong>Paiements et impayés</strong></td><td class="mono">/paiements</td><td>Location</td><td><span class="tag em">Complet</span></td><td>Locataires, biens, WhatsApp</td></tr>
+    <tr><td>06</td><td><strong>Contrats et signature</strong></td><td class="mono">/contrats</td><td>Les deux</td><td><span class="tag em">Complet</span></td><td>Biens, parties, signature canvas</td></tr>
+    <tr><td>07</td><td><strong>Maintenance et charges</strong></td><td class="mono">/maintenance</td><td>Location</td><td><span class="tag em">Complet</span></td><td>Biens, prestataires</td></tr>
+    <tr><td>08</td><td><strong>Le Radar</strong></td><td class="mono">/radar</td><td>Partagé</td><td><span class="tag am">Fonctionnel</span></td><td>Portefeuille, Zapier</td></tr>
+    <tr><td>09</td><td><strong>Analytique et performance</strong></td><td class="mono">/analytique</td><td>Les deux</td><td><span class="tag am">Partiel</span></td><td>Données agrégées de démonstration</td></tr>
+    <tr><td>10</td><td><strong>Système et navigation</strong></td><td>Transverse</td><td>Les deux</td><td><span class="tag em">Complet</span></td><td>i18n, thème, notifications</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">4.2</span>La navigation contextuelle</h3>
+<div class="grid2">
+  <div class="card">
+    <h4>Mode Locatif — 7 entrées</h4>
+    <p class="small"><strong>Tableau de bord</strong> · Portefeuille Location · Locataires · Paiements · Contrats · Maintenance · Analytique · Le Radar · Vitrine publique</p>
+    <p class="small muted">Les contrats sont des baux et des mandats de gestion. Le vocabulaire parle de loyers, de locataires et d'occupation.</p>
+  </div>
+  <div class="card">
+    <h4>Mode Vente — 4 entrées métier</h4>
+    <p class="small"><strong>Tableau de bord</strong> · Portefeuille Vente · Contrats de Vente · Analytique &amp; Ads · Le Radar · Vitrine publique</p>
+    <p class="small muted">Les entrées locataires, paiements et maintenance disparaissent. Les contrats deviennent engagements de vente et compromis. L'analytique s'annonce comme un suivi de campagnes.</p>
+  </div>
+</div>
+
+<div class="callout" style="margin-top:10px">
+  <span class="t">Mécanisme technique</span>
+  La sidebar lit <span class="mono">useModeStore().mode</span> et choisit l'un de deux tableaux de navigation déclarés en dur (<span class="mono">locatifNav</span>, <span class="mono">venteNav</span>). Le mode est persisté sous la clé <span class="mono">movia-mode</span> ; la valeur par défaut est <span class="mono">locatif</span>. Aucune route n'est protégée par le mode : <span class="mono">/paiements</span> reste accessible en tapant l'URL même en mode vente, mais n'apparaît plus dans le menu.
+</div>
+
+<h3><span class="n">4.3</span>Le cycle de vie d'une donnée</h3>
+<div class="flow">
+  <div class="step"><div class="n">ÉTAPE 01</div><div class="t">Lead entrant</div><div class="d">Annonce propriétaire ou demande client, reçue par WhatsApp, saisie ou poussée dans Le Radar.</div></div>
+  <div class="step"><div class="n">ÉTAPE 02</div><div class="t">Qualification</div><div class="d">Aperçu du prix, de la surface, du quartier et de l'intention. Décision : publier ou rejeter.</div></div>
+  <div class="step"><div class="n">ÉTAPE 03</div><div class="t">Bien au portefeuille</div><div class="d">Création de la fiche avec photos, vidéo, statut et référence BIEN-XXXX.</div></div>
+  <div class="step"><div class="n">ÉTAPE 04</div><div class="t">Contrat</div><div class="d">Bail, mandat, engagement de vente ou compromis. Signature et archivage.</div></div>
+  <div class="step"><div class="n">ÉTAPE 05</div><div class="t">Exploitation</div><div class="d">Loyers, relances, tickets de maintenance, charges, renouvellement ou vente.</div></div>
+</div>
+
+<h3><span class="n">4.4</span>Ce qui change réellement entre les deux modes</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:24%">Élément</th><th style="width:34%">Mode Locatif</th><th>Mode Vente</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Navigation</strong></td><td>7 entrées + vitrine</td><td>4 entrées métier + vitrine</td></tr>
+    <tr><td><strong>Vocabulaire des biens</strong></td><td>Loyer, disponibilité, occupation</td><td>Prix, statut de commercialisation</td></tr>
+    <tr><td><strong>Contrats proposés</strong></td><td>Bail, mandat de gestion</td><td>Engagement de vente, compromis</td></tr>
+    <tr><td><strong>Indicateurs</strong></td><td>Revenus, impayés, occupation</td><td>Volume, marge, performance des annonces</td></tr>
+    <tr><td><strong>Modules masqués</strong></td><td>Aucun</td><td>Locataires, paiements, maintenance</td></tr>
+    <tr><td><strong>Données</strong></td><td colspan="2">Identiques — même portefeuille, mêmes biens, aucune duplication</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================ 05 MODULES ============================ -->
+<h2 class="sec">05 · Analyse module par module</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Spécification fonctionnelle détaillée</div>
+  <div class="abstract">Pour chaque module : objectif métier, écran et accès, fonctions réellement implémentées, dictionnaire des données manipulées, règles de gestion et limites constatées. Les captures proviennent de l'application déployée.</div>
+</div>
+
+<div class="callout">
+  <span class="t">Méthode d'analyse</span>
+  Chaque affirmation de ce chapitre a été vérifiée dans le code source (84 fichiers) et dans l'application déployée. Les fonctions décrites existent réellement ; les manques sont signalés explicitement plutôt que masqués par du vocabulaire marketing.
+</div>
+
+<!-- MODULE 01 -->
+<div class="mod-head">
+  <div class="id">MODULE 01</div>
+  <h3>Tableau de bord</h3>
+  <div class="tagline">La journée de l'agence en un seul écran</div>
+  <div class="tags"><span class="tag cy">Recharts</span><span class="tag">FullCalendar</span><span class="tag">KPI</span><span class="tag em">Complet</span></div>
+</div>
+<p>Le tableau de bord répond à la question du matin : « où en est l'agence ? ». Il combine quatre indicateurs de synthèse, un agenda opérationnel et deux graphiques : évolution des revenus sur six mois et taux d'occupation par quartier. C'est l'écran le plus dense du produit et celui qui porte la première impression lors d'une démonstration.</p>
+<div class="fig">
+  <img src="assets/01-dashboard.jpg" alt="Tableau de bord ImmoSolver en mode locatif" />
+  <div class="figcap"><span>Tableau de bord — mode locatif, données de démonstration (Tanger).</span><span class="r">/</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Quatre KPI : revenus mensuels, impayés, taux d'occupation, locataires actifs.</li>
+      <li>Agenda FullCalendar en vues mois et semaine, avec visites, signatures, états des lieux, rendez-vous propriétaire et maintenance.</li>
+      <li>Création d'un événement depuis le calendrier, avec bien, client et notes.</li>
+      <li>Courbe revenus perçus vs attendus sur six mois.</li>
+      <li>Histogramme d'occupation par zone : Centre Ville, Malabata, Iberia, Marshan, Achakar.</li>
+      <li>Effet de survol et infobulles sur les graphiques.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Données et règles</h4>
+    <ul class="ticks">
+      <li>Les séries des graphiques sont des constantes déclarées dans les composants, non calculées depuis les paiements.</li>
+      <li>Les événements de l'agenda vivent dans l'état local de la page ; ils disparaissent au rechargement.</li>
+      <li>Le libellé des KPI s'adapte au mode, les valeurs restent des données de démonstration.</li>
+      <li>Aucune agrégation réelle : le module ne lit ni les paiements ni les contrats.</li>
+    </ul>
+  </div>
+</div>
+<div class="verdict"><strong>Limite principale :</strong> le tableau de bord est un écran de démonstration statique. Il donne une lecture juste du produit, mais ne peut pas servir de pilotage réel tant que les indicateurs ne sont pas calculés depuis les données métier.</div>
+
+<!-- MODULE 02 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 02</div>
+  <h3>Portefeuille de biens</h3>
+  <div class="tagline">Le catalogue vivant de l'agence</div>
+  <div class="tags"><span class="tag">Vente + location</span><span class="tag">CRUD</span><span class="tag">Recherche</span><span class="tag em">Complet</span></div>
+</div>
+<p>Le portefeuille est le cœur du produit. Il affiche les biens en grille de cartes ou en tableau, avec une recherche instantanée et un filtre par statut. Chaque carte ouvre une fiche latérale complète : carrousel photo, caractéristiques, description, statut, édition sur place et suppression confirmée. La même liste sert la location et la vente.</p>
+<div class="fig">
+  <img src="assets/02-portefeuille.jpg" alt="Portefeuille de biens en grille" />
+  <div class="figcap"><span>Portefeuille — vue grille, recherche et compteur de biens.</span><span class="r">/portefeuille</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Création en trois onglets : Informations, Détails, Médias.</li>
+      <li>Recherche par titre, zone ou référence (BIEN-0001, BIEN-0002…).</li>
+      <li>Bascule grille / tableau, compteur de résultats, état vide explicite.</li>
+      <li>Fiche latérale : carrousel, caractéristiques, propriétaire, statut, actions.</li>
+      <li>Édition en place et suppression protégée par dialogue de confirmation.</li>
+      <li>Photos par URL (jusqu'à six et plus) et vidéo YouTube / Vimeo embarquée.</li>
+      <li>Toasts de confirmation sur création, mise à jour et suppression.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Dictionnaire du bien</h4>
+    <table class="tbl compact" style="margin:4px 0 0">
+      <tbody>
+        <tr><td class="mono">id</td><td>BIEN-XXXX, généré</td></tr>
+        <tr><td class="mono">title</td><td>Titre commercial</td></tr>
+        <tr><td class="mono">type</td><td>Appartement, Villa, Studio…</td></tr>
+        <tr><td class="mono">zone</td><td>Quartier + ville</td></tr>
+        <tr><td class="mono">surface / rooms / baths</td><td>Nombres entiers</td></tr>
+        <tr><td class="mono">price</td><td>Loyer ou prix, en MAD</td></tr>
+        <tr><td class="mono">status</td><td>Disponible · Loué · Vendu</td></tr>
+        <tr><td class="mono">photos[]</td><td>URLs d'images</td></tr>
+        <tr><td class="mono">videoUrl</td><td>URL d'embed, optionnelle</td></tr>
+        <tr><td class="mono">description</td><td>Texte libre</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="verdict"><strong>Anomalie constatée :</strong> le formulaire collecte une adresse et des équipements (parking, ascenseur, piscine, vue mer…), mais le type <span class="mono">PropertyData</span> ne les contient pas. Ces informations sont perdues à l'enregistrement. Voir chapitre 07.5.</div>
+
+<!-- MODULE 03 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 03</div>
+  <h3>Fiche bien et galerie</h3>
+  <div class="tagline">Tout ce qu'un client veut voir, sans quitter le CRM</div>
+  <div class="tags"><span class="tag cy">Médias</span><span class="tag">Carrousel</span><span class="tag">Vidéo</span><span class="tag em">Complet</span></div>
+</div>
+<p>La fiche bien est le point de convergence entre l'agent, le propriétaire et l'acquéreur. Elle reprend le carrousel photo, la vidéo de visite, la description, le prix, le statut et les actions rapides. C'est l'écran à privilégier dans une vidéo de démonstration : il montre en quelques secondes la promesse « tout est au même endroit ».</p>
+<div class="fig">
+  <img src="assets/03-bien-detail.jpg" alt="Fiche détaillée d'un bien avec galerie" />
+  <div class="figcap"><span>Fiche bien — galerie, caractéristiques et édition.</span><span class="r">/portefeuille</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Carrousel plein cadre avec navigation précédent / suivant et compteur.</li>
+      <li>Onglet vidéo pour les visites filmées (iframe YouTube ou Vimeo).</li>
+      <li>Édition complète du bien depuis la fiche, sans changer d'écran.</li>
+      <li>Partage et aperçu public préparés pour la future vitrine.</li>
+      <li>Suppression avec confirmation et retour à la liste.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Règles et limites</h4>
+    <ul class="ticks">
+      <li>Les photos sont des URLs distantes : aucun téléversement de fichier.</li>
+      <li>Une seule vidéo par bien ; pas de galerie de visites.</li>
+      <li>L'aperçu public n'est pas relié à la vitrine, encore en Phase 2.</li>
+      <li>Pas de gestion des pièces jointes (diagnostics, plans, titre foncier).</li>
+    </ul>
+  </div>
+</div>
+<div class="verdict"><strong>Valeur perçue :</strong> très élevée en démonstration. La fiche bien est le meilleur support pour montrer la qualité du design system et la fluidité des transitions.</div>
+
+<!-- MODULE 04 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 04</div>
+  <h3>Locataires et clients</h3>
+  <div class="tagline">Un dossier client, pas un carnet d'adresses</div>
+  <div class="tags"><span class="tag em">CIN</span><span class="tag">Score</span><span class="tag">Filtres</span><span class="tag em">Complet</span></div>
+</div>
+<p>Chaque locataire dispose d'un dossier structuré : identité marocaine, coordonnées, profession, nationalité, contact d'urgence, bien assigné, notes internes et score de fiabilité. La recherche couvre le nom, la CIN et le téléphone ; les filtres séparent les actifs, les inactifs et les archivés. C'est le module qui donne au produit sa crédibilité métier locale.</p>
+<div class="fig">
+  <img src="assets/04-locataires.jpg" alt="Liste des locataires avec filtres et scores" />
+  <div class="figcap"><span>Locataires — liste, filtres par statut et score de confiance.</span><span class="r">/locataires</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Création en trois sections : identité, contact, situation locative.</li>
+      <li>Champs : prénom, nom, CIN, téléphone, e-mail, profession, nationalité.</li>
+      <li>Contact d'urgence, bien assigné, notes internes et score (0–100).</li>
+      <li>Recherche par nom, CIN ou téléphone ; filtres Actif / Inactif / Archivé.</li>
+      <li>Fiche détaillée éditable, archivage réversible, suppression confirmée.</li>
+      <li>Initiales générées automatiquement pour l'avatar.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Dictionnaire du locataire</h4>
+    <table class="tbl compact" style="margin:4px 0 0">
+      <tbody>
+        <tr><td class="mono">name / initials</td><td>Identité et avatar</td></tr>
+        <tr><td class="mono">cin</td><td>Carte d'identité nationale</td></tr>
+        <tr><td class="mono">phone / email</td><td>Coordonnées</td></tr>
+        <tr><td class="mono">profession / nationality</td><td>Situation</td></tr>
+        <tr><td class="mono">status</td><td>Actif · Inactif · Archivé</td></tr>
+        <tr><td class="mono">score</td><td>Fiabilité perçue, 0–100</td></tr>
+        <tr><td class="mono">property</td><td>Référence du bien assigné</td></tr>
+        <tr><td class="mono">notes</td><td>Commentaire interne</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="verdict"><strong>Limite :</strong> les pièces justificatives (copie de CIN, contrat de travail, attestation de salaire) ne sont pas stockées. Le score est saisi manuellement, sans calcul ni historique.</div>
+
+<!-- MODULE 05 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 05</div>
+  <h3>Paiements et impayés</h3>
+  <div class="tagline">Le cash-flow locatif sous contrôle</div>
+  <div class="tags"><span class="tag am">Recouvrement</span><span class="tag">WhatsApp</span><span class="tag em">Complet</span></div>
+</div>
+<p>Le module des paiements transforme le suivi des loyers en une file d'actions. Trois totaux synthétiques donnent la situation du mois — attendu, collecté, reste dû — puis chaque ligne porte un statut, un mode de paiement et une action de relance WhatsApp pré-remplie. Le gestionnaire traite un impayé en deux clics.</p>
+<div class="fig">
+  <img src="assets/05-paiements.jpg" alt="Suivi des paiements et impayés" />
+  <div class="figcap"><span>Paiements — totaux du mois, statuts et relance WhatsApp.</span><span class="r">/paiements</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Encaissements : total attendu, collecté, reste dû.</li>
+      <li>Statuts : Payé, En attente, Partiel, En retard, Archivé.</li>
+      <li>Modes : virement, chèque, espèces, carte.</li>
+      <li>Remise automatique du loyer selon le locataire sélectionné.</li>
+      <li>Relance WhatsApp avec référence, bien, mois et montant contextualisés.</li>
+      <li>Édition du statut, archivage et suppression avec confirmation.</li>
+      <li>Cartes d'alerte pour les retards et les paiements partiels.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Dictionnaire du paiement</h4>
+    <table class="tbl compact" style="margin:4px 0 0">
+      <tbody>
+        <tr><td class="mono">ref</td><td>PAY-2026-XXX</td></tr>
+        <tr><td class="mono">tenant</td><td>Locataire concerné</td></tr>
+        <tr><td class="mono">property</td><td>Bien concerné</td></tr>
+        <tr><td class="mono">month</td><td>MM/AAAA</td></tr>
+        <tr><td class="mono">amount / paid</td><td>Attendu / encaissé</td></tr>
+        <tr><td class="mono">status</td><td>5 états métier</td></tr>
+        <tr><td class="mono">date</td><td>Date d'encaissement</td></tr>
+        <tr><td class="mono">mode</td><td>Virement, chèque, espèces, carte</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="verdict"><strong>Limite :</strong> pas de quittance PDF ni de rapprochement bancaire. La table des locataires est dupliquée en dur dans le module (<span class="mono">TENANT_PROPERTY_MAP</span>), ce qui peut produire des incohérences si un locataire est renommé ailleurs.</div>
+
+<!-- MODULE 06 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 06</div>
+  <h3>Contrats et signature électronique</h3>
+  <div class="tagline">Du brouillon au contrat signé, sans imprimante</div>
+  <div class="tags"><span class="tag vi">Signature</span><span class="tag">Impression</span><span class="tag">4 types</span><span class="tag em">Complet</span></div>
+</div>
+<p>C'est le module le plus différenciant. Quatre types de contrats sont proposés selon le mode : bail et mandat de gestion en location ; engagement de vente et compromis en vente. Le cycle de vie va du brouillon à l'archivage, avec une étape d'envoi. La signature est capturée au doigt, au stylet ou à la souris, stockée avec le contrat et injectée dans un aperçu imprimable.</p>
+<div class="fig">
+  <img src="assets/06-contrats.jpg" alt="Portefeuille contractuel avec statuts et signatures" />
+  <div class="figcap"><span>Contrats — compteurs par statut, parties, montants et signature.</span><span class="r">/contrats</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Cycle : Brouillon → Envoyé → Signé → Archivé.</li>
+      <li>Signature canvas (react-signature-canvas) attachée au contrat.</li>
+      <li>Aperçu imprimable : clauses, parties, montants, zones de signature.</li>
+      <li>Commission et prix de vente pour les mandats et compromis.</li>
+      <li>Champs parties : nom, téléphone, CIN, propriétaire et téléphone propriétaire.</li>
+      <li>Compteurs par statut et alerte sur les contrats proches de l'expiration.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Dictionnaire du contrat</h4>
+    <table class="tbl compact" style="margin:4px 0 0">
+      <tbody>
+        <tr><td class="mono">id / kind</td><td>C-2026-XXX · 4 types</td></tr>
+        <tr><td class="mono">property / party</td><td>Bien et cocontractant</td></tr>
+        <tr><td class="mono">partyPhone / partyCIN</td><td>Coordonnées et identité</td></tr>
+        <tr><td class="mono">start / end</td><td>Dates de validité</td></tr>
+        <tr><td class="mono">rent / price</td><td>Loyer ou prix de vente</td></tr>
+        <tr><td class="mono">commission</td><td>Pourcentage de commission</td></tr>
+        <tr><td class="mono">status</td><td>4 états du cycle de vie</td></tr>
+        <tr><td class="mono">signature</td><td>Image data-URL du tracé</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="verdict"><strong>Limite juridique :</strong> la signature est une preuve visuelle, pas une signature électronique qualifiée au sens de la loi 43-20 ou d'eIDAS. Aucun horodatage, certificat, scellement ni piste d'audit n'est produit.</div>
+
+<!-- MODULE 07 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 07</div>
+  <h3>Maintenance et charges</h3>
+  <div class="tagline">Réparer vite, anticiper les factures</div>
+  <div class="tags"><span class="tag ro">Exploitation</span><span class="tag">Tickets</span><span class="tag">Charges</span><span class="tag em">Complet</span></div>
+</div>
+<p>Deux onglets complémentaires. Les tickets d'intervention suivent une panne de l'ouverture à la résolution, avec catégorie, priorité, prestataire et coût. Les rappels de charges anticipent les échéances d'électricité, d'eau et de gaz, avec un jour mensuel et un marquage « payé ». Le module donne au gestionnaire une vision complète du coût d'exploitation.</p>
+<div class="fig">
+  <img src="assets/07-maintenance.jpg" alt="Tickets de maintenance et priorités" />
+  <div class="figcap"><span>Maintenance — tickets, priorités, prestataires et coûts cumulés.</span><span class="r">/maintenance</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Tickets : titre, bien, catégorie, priorité, statut, prestataire, coût.</li>
+      <li>Catégories : plomberie, électricité, climatisation, peinture, serrurerie, autre.</li>
+      <li>Priorités : basse, moyenne, haute, urgente.</li>
+      <li>Statuts : ouvert, en cours, résolu.</li>
+      <li>Compteurs par statut et coût cumulé des interventions.</li>
+      <li>Rappels de charges : type, bien, jour d'échéance, marquage payé.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Règles et limites</h4>
+    <ul class="ticks">
+      <li>Le coût est saisi manuellement ; aucun lien avec une facture ou un devis.</li>
+      <li>Pas de photos d'intervention ni de planning prestataire.</li>
+      <li>Les rappels de charges ne génèrent pas de notification automatique.</li>
+      <li>Aucun historique de coût par bien ni comparaison entre prestataires.</li>
+    </ul>
+  </div>
+</div>
+<div class="verdict"><strong>Valeur :</strong> le module couvre le besoin réel d'une agence locative. Il manque la preuve photographique et le lien comptable pour devenir un outil d'exploitation complet.</div>
+
+<!-- MODULE 08 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 08</div>
+  <h3>Le Radar</h3>
+  <div class="tagline">Transformer les messages en mandats</div>
+  <div class="tags"><span class="tag cy">Leads</span><span class="tag">Zapier</span><span class="tag">WhatsApp</span><span class="tag am">Fonctionnel</span></div>
+</div>
+<p>Le Radar est le sas d'entrée des opportunités. Il distingue les annonces de propriétaires et les demandes de clients, majoritairement reçues par WhatsApp. Chaque lead est présenté comme une carte avec photo, type, intention location ou vente, prix, ville, surface et source. L'agent ouvre un aperçu, vérifie les informations, puis publie le bien au portefeuille ou rejette le lead.</p>
+<div class="fig">
+  <img src="assets/09-radar.jpg" alt="Le Radar — file de qualification des leads" />
+  <div class="figcap"><span>Le Radar — annonces et demandes entrantes, actions de qualification.</span><span class="r">/radar</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Cartes lead : photo, titre, type, intention, prix, ville, surface, source.</li>
+      <li>Aperçu détaillé avant décision, avec description et métadonnées.</li>
+      <li>« Publier » crée le bien correspondant dans le portefeuille.</li>
+      <li>« Rejeter » retire le lead de la file avec toast de confirmation.</li>
+      <li>Webhook Zapier optionnel pour pousser les événements vers un automate.</li>
+      <li>Clé API de démonstration lue depuis les variables d'environnement.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Règles et limites</h4>
+    <ul class="ticks">
+      <li>Les leads sont des constantes : aucun flux WhatsApp entrant réel.</li>
+      <li>La publication recopie les champs disponibles ; les photos restent des URLs.</li>
+      <li>Le webhook ne fonctionne que si <span class="mono">VITE_ZAPIER_WEBHOOK_URL</span> est défini au build.</li>
+      <li>Une clé de repli <span class="mono">movia-secret-2026</span> est présente dans le bundle : à retirer avant production.</li>
+    </ul>
+  </div>
+</div>
+<div class="verdict"><strong>Valeur :</strong> le Radar raconte parfaitement le flux « message → mandat ». C'est le module à montrer après le portefeuille pour expliquer d'où viennent les biens.</div>
+
+<!-- MODULE 09 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 09</div>
+  <h3>Analytique et performance</h3>
+  <div class="tagline">Les chiffres qui déclenchent une décision</div>
+  <div class="tags"><span class="tag">Décision</span><span class="tag">Recharts</span><span class="tag am">Partiel</span></div>
+</div>
+<p>Le module analytique compare les revenus perçus aux revenus attendus sur six mois et mesure la tension locative par quartier. En mode vente, il devient le tableau de bord des campagnes publicitaires. L'intention est claire : donner au dirigeant une lecture immédiate des zones sous-performantes et des écarts de recouvrement.</p>
+<div class="fig">
+  <img src="assets/10-analytique.jpg" alt="Analytique et performance" />
+  <div class="figcap"><span>Analytique — revenus et occupation par zone.</span><span class="r">/analytique</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Courbe revenus perçus / attendus sur six mois.</li>
+      <li>Occupation par zone avec code couleur et lecture immédiate.</li>
+      <li>Adaptation du discours en mode vente (Analytique &amp; Ads).</li>
+      <li>Base visuelle prête pour des métriques d'acquisition.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Limites</h4>
+    <ul class="ticks">
+      <li>Les séries sont des constantes, pas des agrégations de paiements.</li>
+      <li>Aucun coût par lead, aucun ROI, aucune attribution de campagne.</li>
+      <li>Pas d'export CSV ni de comparaison de périodes.</li>
+      <li>Pas de filtre par agence, par agent ou par type de bien.</li>
+    </ul>
+  </div>
+</div>
+<div class="verdict"><strong>Limite principale :</strong> c'est un écran d'intention, pas encore un outil d'analyse. Il faut le présenter comme une direction produit, pas comme un reporting fiable.</div>
+
+<!-- MODULE 10 -->
+<div class="mod-head pb">
+  <div class="id">MODULE 10</div>
+  <h3>Système : navigation, i18n, thème, notifications</h3>
+  <div class="tagline">L'infrastructure invisible qui rend l'outil agréable</div>
+  <div class="tags"><span class="tag em">FR / AR</span><span class="tag">RTL</span><span class="tag">Thème</span><span class="tag em">Complet</span></div>
+</div>
+<p>Ce module transverse n'apparaît pas dans le menu mais conditionne toute l'expérience : sidebar repliable avec icônes liquides, sélecteur de mode, centre de notifications, bascule nuit / jour, changement de langue avec passage complet en RTL et profil administrateur. C'est ce qui différencie un prototype d'un produit utilisable au quotidien.</p>
+<div class="fig">
+  <img src="assets/13-arabe-rtl.jpg" alt="Interface en arabe avec direction RTL" />
+  <div class="figcap"><span>Interface arabe — direction RTL, sidebar à droite, libellés traduits.</span><span class="r">/</span></div>
+</div>
+<div class="duo">
+  <div>
+    <h4>Fonctions implémentées</h4>
+    <ul class="ticks">
+      <li>Navigation contextuelle : 7 entrées en location, 4 en vente, 2 partagées.</li>
+      <li>Bilingue français / arabe avec <span class="mono">dir="rtl"</span> natif.</li>
+      <li>Thème sombre par défaut et thème clair disponible.</li>
+      <li>Notifications : lecture, tout marquer lu, suppression.</li>
+      <li>Recherche globale et profil « Adil M. · Administrateur ».</li>
+      <li>Sidebar repliable et adaptée au mobile.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Comportements et limites</h4>
+    <ul class="ticks">
+      <li>Le mode, le thème et les notifications sont persistés dans <span class="mono">localStorage</span>.</li>
+      <li>La langue est mémorisée sous <span class="mono">movia-lang</span>.</li>
+      <li>Le profil et la recherche globale sont décoratifs.</li>
+      <li>Une partie des libellés métier reste en français même en arabe (voir chapitre 10).</li>
+    </ul>
+  </div>
+</div>
+<div class="verdict"><strong>Point fort :</strong> le RTL complet est rare sur ce type de produit et constitue un argument fort pour le marché marocain. Il mérite une séquence dédiée dans la vidéo.</div>
+
+<!-- ============================ 06 PARCOURS ============================ -->
+<h2 class="sec">06 · Parcours utilisateurs</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Les gestes réels</div>
+  <div class="abstract">Quatre parcours décrivent l'usage de bout en bout. Ils servent de fil narratif à la vidéo de démonstration et de base aux tests d'acceptation.</div>
+</div>
+
+<h3><span class="n">6.1</span>Agent commercial — de l'annonce au mandat</h3>
+<table class="tbl">
+  <thead><tr><th style="width:6%">#</th><th style="width:18%">Écran</th><th style="width:38%">Action</th><th>Résultat attendu</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Le Radar</td><td>Ouvrir un lead « Villa avec piscine — Cap Spartel »</td><td>L'aperçu affiche prix, surface, ville, intention et description</td></tr>
+    <tr><td>2</td><td>Le Radar</td><td>Vérifier la cohérence puis cliquer sur « Publier »</td><td>Le bien est créé au portefeuille avec une référence BIEN-XXXX</td></tr>
+    <tr><td>3</td><td>Portefeuille</td><td>Enrichir la fiche : photos, description, statut</td><td>La fiche est complète et recherchable</td></tr>
+    <tr><td>4</td><td>Contrats de vente</td><td>Créer un engagement de vente avec prix et commission</td><td>Le contrat apparaît en brouillon</td></tr>
+    <tr><td>5</td><td>Contrats</td><td>Faire signer à l'écran puis archiver</td><td>Le statut passe à « Signé » et la signature est visible</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">6.2</span>Gestionnaire locatif — du loyer à l'intervention</h3>
+<table class="tbl">
+  <thead><tr><th style="width:6%">#</th><th style="width:18%">Écran</th><th style="width:38%">Action</th><th>Résultat attendu</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Paiements</td><td>Lire les totaux attendu / collecté / reste dû</td><td>Les impayés du mois sont identifiés</td></tr>
+    <tr><td>2</td><td>Paiements</td><td>Ouvrir la ligne « En retard » et cliquer sur WhatsApp</td><td>Un message contextualisé est prêt à envoyer</td></tr>
+    <tr><td>3</td><td>Paiements</td><td>Passer le statut à « Payé » après encaissement</td><td>Les totaux se recalculent, la ligne sort des alertes</td></tr>
+    <tr><td>4</td><td>Maintenance</td><td>Créer un ticket « Fuite chauffe-eau », priorité haute</td><td>Le ticket apparaît en « Ouvert » avec le bien concerné</td></tr>
+    <tr><td>5</td><td>Maintenance</td><td>Renseigner le prestataire, le coût, puis résoudre</td><td>Le coût entre dans le cumul d'exploitation</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">6.3</span>Direction — piloter sans attendre le reporting</h3>
+<table class="tbl">
+  <thead><tr><th style="width:6%">#</th><th style="width:18%">Écran</th><th style="width:38%">Action</th><th>Résultat attendu</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Tableau de bord</td><td>Lire les quatre KPI et l'agenda du jour</td><td>La situation générale est comprise en moins de trente secondes</td></tr>
+    <tr><td>2</td><td>Analytique</td><td>Repérer la zone la moins occupée</td><td>Une décision commerciale peut être prise (prix, campagne)</td></tr>
+    <tr><td>3</td><td>Contrats</td><td>Identifier les baux qui expirent</td><td>Les renouvellements sont planifiés</td></tr>
+    <tr><td>4</td><td>Portefeuille</td><td>Comparer les biens disponibles et loués</td><td>Le stock réel est visible</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">6.4</span>Mise en route d'une nouvelle agence</h3>
+<div class="flow">
+  <div class="step"><div class="n">JOUR 1</div><div class="t">Paramétrer</div><div class="d">Choisir le mode, la langue et le thème. Aucune configuration serveur n'est nécessaire.</div></div>
+  <div class="step"><div class="n">JOUR 1</div><div class="t">Importer</div><div class="d">Saisir les premiers biens, locataires et contrats en cours. Les données restent dans le navigateur.</div></div>
+  <div class="step"><div class="n">JOUR 2</div><div class="t">Exploiter</div><div class="d">Suivre les loyers, les tickets et les leads. Former l'équipe aux quatre gestes quotidiens.</div></div>
+  <div class="step"><div class="n">JOUR 3</div><div class="t">Constater</div><div class="d">Mesurer la limite : sans serveur, les données ne sont pas partagées entre appareils.</div></div>
+</div>
+<div class="warn"><span class="t">Point de vigilance</span>La mise en route réelle est impossible en l'état : chaque navigateur possède ses propres données, et vider le cache efface le travail. Ce parcours décrit l'usage de démonstration, pas un déploiement client.</div>
+
+<!-- ============================ 07 MODELE DE DONNEES ============================ -->
+<h2 class="sec">07 · Modèle de données</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Structure de l'information</div>
+  <div class="abstract">Huit entités métier, quatre stores Zustand, un stockage navigateur. Le modèle est simple et lisible, mais il lui manque les relations, les contraintes et la persistance qui feraient un système de production.</div>
+</div>
+
+<h3><span class="n">7.1</span>Vue d'ensemble des entités</h3>
+<div class="diagram">
+  <div class="layer"><div class="k">Prospect</div><div class="v"><span class="pill hi">Lead</span> → devient → <span class="pill hi">Property</span> (publication au portefeuille)</div></div>
+  <div class="layer"><div class="k">Patrimoine</div><div class="v"><span class="pill">Property</span> 1 ── n <span class="pill">Contract</span> · 1 ── n <span class="pill">Ticket</span> · 1 ── n <span class="pill">BillReminder</span></div></div>
+  <div class="layer"><div class="k">Personnes</div><div class="v"><span class="pill wa">Tenant</span> 1 ── n <span class="pill">Payment</span> · 1 ── n <span class="pill wa">Contract</span></div></div>
+  <div class="layer"><div class="k">Exploitation</div><div class="v"><span class="pill">Payment</span> · <span class="pill">Ticket</span> · <span class="pill">BillReminder</span> → alimentent les indicateurs (non branchés)</div></div>
+  <div class="layer"><div class="k">Transverse</div><div class="v"><span class="pill">Notification</span> · <span class="pill">Mode</span> · <span class="pill">Theme</span> · <span class="pill">Language</span></div></div>
+</div>
+<p class="note">Les relations ci-dessus sont logiques. Dans le code, les entités ne sont pas reliées par des identifiants étrangers typés : les contrats, paiements et tickets stockent le nom du bien ou du locataire sous forme de chaîne. Aucune intégrité référentielle n'est garantie.</p>
+
+<h3><span class="n">7.2</span>Dictionnaires des entités</h3>
+
+<h4>Property — bien immobilier</h4>
+<table class="tbl compact">
+  <thead><tr><th style="width:18%">Champ</th><th style="width:16%">Type</th><th style="width:12%">Obligatoire</th><th>Règle / observation</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">id</td><td>string</td><td>Oui</td><td>Format BIEN-0001, généré à la création</td></tr>
+    <tr><td class="mono">title</td><td>string</td><td>Oui</td><td>Titre commercial libre</td></tr>
+    <tr><td class="mono">type</td><td>string</td><td>Oui</td><td>Appartement, Villa, Studio, etc.</td></tr>
+    <tr><td class="mono">zone</td><td>string</td><td>Oui</td><td>Quartier et ville</td></tr>
+    <tr><td class="mono">surface</td><td>number</td><td>Oui</td><td>Mètres carrés</td></tr>
+    <tr><td class="mono">rooms / baths</td><td>number</td><td>Non</td><td>Chambres et salles de bain</td></tr>
+    <tr><td class="mono">price</td><td>number</td><td>Oui</td><td>Loyer ou prix en MAD, sans devise ni décimales</td></tr>
+    <tr><td class="mono">status</td><td>union</td><td>Oui</td><td>Disponible · Loué · Vendu</td></tr>
+    <tr><td class="mono">photos</td><td>string[]</td><td>Non</td><td>URLs distantes, pas de fichier local</td></tr>
+    <tr><td class="mono">videoUrl</td><td>string</td><td>Non</td><td>URL d'embed YouTube ou Vimeo</td></tr>
+    <tr><td class="mono">description</td><td>string</td><td>Non</td><td>Texte libre</td></tr>
+    <tr><td class="mono">address</td><td>—</td><td>—</td><td><strong>Présent au formulaire, absent du type : perdu à l'enregistrement</strong></td></tr>
+    <tr><td class="mono">amenities</td><td>—</td><td>—</td><td><strong>Sélectionnés au formulaire, non persistés</strong></td></tr>
+  </tbody>
+</table>
+
+<h4>Tenant, Payment, Contract, Ticket, BillReminder, Lead, Notification</h4>
+<table class="tbl compact">
+  <thead><tr><th style="width:15%">Entité</th><th style="width:44%">Champs principaux</th><th>États / contraintes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tenant</strong></td><td class="mono">name, initials, cin, phone, email, profession, nationality, status, score, property, notes</td><td>Actif · Inactif · Archivé ; score 0–100</td></tr>
+    <tr><td><strong>Payment</strong></td><td class="mono">ref, tenant, property, month, amount, paid, status, date, mode, archived</td><td>Payé · En attente · Partiel · En retard · Archivé</td></tr>
+    <tr><td><strong>Contract</strong></td><td class="mono">id, kind, property, party, partyPhone, partyCIN, ownerName, ownerPhone, start, end, rent, price, commission, status, signature, notes</td><td>Brouillon · Envoyé · Signé · Archivé ; 4 types</td></tr>
+    <tr><td><strong>Ticket</strong></td><td class="mono">id, title, property, category, priority, status, provider, cost, createdAt</td><td>Ouvert · En cours · Résolu ; 4 priorités ; 6 catégories</td></tr>
+    <tr><td><strong>BillReminder</strong></td><td class="mono">id, property, type, dueDay, paid, createdAt</td><td>Électricité · Eau · Gaz ; jour 1–31 ; payé oui/non</td></tr>
+    <tr><td><strong>Lead</strong></td><td class="mono">id, type, intent, title, price, city, propertyType, surface, source, image, description</td><td>Annonce · Demande ; location · vente</td></tr>
+    <tr><td><strong>Notification</strong></td><td class="mono">id, title, body, kind, link, read, createdAt</td><td>Info · Succès · Avertissement · Danger</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">7.3</span>Stores et persistance</h3>
+<table class="tbl">
+  <thead><tr><th style="width:22%">Store / mécanisme</th><th style="width:38%">Contenu</th><th style="width:14%">Persisté</th><th>Clé</th></tr></thead>
+  <tbody>
+    <tr><td><strong>portfolioStore</strong></td><td>Biens, photos, vidéo, prix, statut</td><td><span class="tag ro">Non</span></td><td>—</td></tr>
+    <tr><td><strong>modeStore</strong></td><td>Mode vente / locatif</td><td><span class="tag em">Oui</span></td><td class="mono">movia-mode</td></tr>
+    <tr><td><strong>themeStore</strong></td><td>Thème nuit / jour</td><td><span class="tag em">Oui</span></td><td class="mono">movia-theme</td></tr>
+    <tr><td><strong>notificationStore</strong></td><td>Notifications et état de lecture</td><td><span class="tag em">Oui</span></td><td class="mono">movia-notifications</td></tr>
+    <tr><td><strong>Langue</strong></td><td>Français / arabe</td><td><span class="tag em">Oui</span></td><td class="mono">movia-lang</td></tr>
+    <tr><td><strong>useState local</strong></td><td>Locataires, paiements, contrats, tickets, charges, leads, agenda</td><td><span class="tag ro">Non</span></td><td>—</td></tr>
+  </tbody>
+</table>
+
+<div class="warn">
+  <span class="t">Conséquence directe</span>
+  Un rechargement de page réinitialise les locataires, paiements, contrats, tickets et leads aux données de démonstration. Seuls le mode, le thème, la langue et les notifications survivent. Le portefeuille lui-même n'est pas persisté : un bien créé disparaît au rechargement.
+</div>
+
+<h3><span class="n">7.4</span>Règles de génération et de calcul</h3>
+<ul class="ticks">
+  <li>Les références sont générées par concaténation d'un préfixe et d'un compteur ou d'un horodatage (BIEN-, PAY-, C-, T-, LEAD-).</li>
+  <li>Les montants sont des nombres entiers en MAD, sans séparateur de milliers ni décimales dans le modèle.</li>
+  <li>Les totaux de paiement sont recalculés à l'affichage par réduction du tableau, pas stockés.</li>
+  <li>Le score de fiabilité est saisi manuellement ; aucune formule ne le dérive des paiements.</li>
+  <li>Les dates sont majoritairement des chaînes formatées (JJ/MM/AAAA), pas des objets <span class="mono">Date</span>.</li>
+</ul>
+
+<h3><span class="n">7.5</span>Anomalies de modèle à corriger</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:8%">ID</th><th style="width:34%">Anomalie</th><th style="width:12%">Impact</th><th>Correction recommandée</th></tr></thead>
+  <tbody>
+    <tr><td>A1</td><td>Adresse du bien collectée mais absente du type <span class="mono">PropertyData</span></td><td>Perte de donnée</td><td>Ajouter <span class="mono">address</span> au type et au payload de création</td></tr>
+    <tr><td>A2</td><td>Équipements sélectionnés mais non enregistrés</td><td>Perte de donnée</td><td>Ajouter <span class="mono">amenities: string[]</span></td></tr>
+    <tr><td>A3</td><td>Pas de clé étrangère : bien et locataire stockés par nom</td><td>Incohérence</td><td>Utiliser des identifiants stables et des jointures</td></tr>
+    <tr><td>A4</td><td>Portefeuille non persisté</td><td>Perte totale</td><td>Persister ou migrer vers une API</td></tr>
+    <tr><td>A5</td><td>Table locataire dupliquée dans les paiements</td><td>Désynchronisation</td><td>Lire la source unique du store locataires</td></tr>
+    <tr><td>A6</td><td>Montants sans devise ni précision</td><td>Ambiguïté</td><td>Stocker en centimes + code devise MAD</td></tr>
+    <tr><td>A7</td><td>Dates en chaînes locales</td><td>Tri et calculs</td><td>Stocker en ISO 8601 UTC</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================ 08 ARCHITECTURE ============================ -->
+<h2 class="sec">08 · Architecture technique</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Comment c'est construit</div>
+  <div class="abstract">Une application front-end pure, compilée par Vite en fichiers statiques, servie par un CDN. Aucune API, aucune base, aucun serveur à maintenir — un choix assumé qui explique à la fois la vitesse du produit et ses limites.</div>
+</div>
+
+<h3><span class="n">8.1</span>Vue en couches</h3>
+<div class="diagram">
+  <div class="layer"><div class="k">Présentation</div><div class="v"><span class="pill hi">React 19</span><span class="pill">TanStack Router</span><span class="pill">Tailwind CSS 4</span><span class="pill">shadcn/ui (Radix)</span><span class="pill">Lucide</span><span class="pill">Recharts</span><span class="pill">FullCalendar</span><span class="pill">Sonner</span></div></div>
+  <div class="layer"><div class="k">État</div><div class="v"><span class="pill wa">Zustand 5</span><span class="pill">persist (mode, thème, notifications)</span><span class="pill">useState local</span><span class="pill">localStorage</span></div></div>
+  <div class="layer"><div class="k">Logique métier</div><div class="v"><span class="pill">Composants de route</span><span class="pill">Formulaires contrôlés</span><span class="pill">Réductions de totaux</span><span class="pill">Génération de références</span></div></div>
+  <div class="layer"><div class="k">Intégrations</div><div class="v"><span class="pill">WhatsApp wa.me</span><span class="pill wa">Zapier webhook</span><span class="pill">YouTube / Vimeo</span><span class="pill">Unsplash</span></div></div>
+  <div class="layer"><div class="k">Build &amp; diffusion</div><div class="v"><span class="pill">Vite 6</span><span class="pill">TypeScript 5.8</span><span class="pill">ESLint / Prettier</span><span class="pill hi">Hostinger statique</span><span class="pill">.htaccess SPA</span></div></div>
+</div>
+
+<h3><span class="n">8.2</span>Stack et versions</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:26%">Dépendance</th><th style="width:14%">Version</th><th>Rôle dans le produit</th></tr></thead>
+  <tbody>
+    <tr><td>react / react-dom</td><td class="mono">19.1</td><td>Rendu de l'interface</td></tr>
+    <tr><td>typescript</td><td class="mono">5.8.3</td><td>Typage strict (<span class="mono">strict: true</span>)</td></tr>
+    <tr><td>vite</td><td class="mono">6.3.5</td><td>Build et serveur de développement</td></tr>
+    <tr><td>@tanstack/react-router</td><td class="mono">1.121</td><td>Routage typé et découpage par route</td></tr>
+    <tr><td>tailwindcss</td><td class="mono">4.2.1</td><td>Design system par tokens</td></tr>
+    <tr><td>zustand</td><td class="mono">5.0.13</td><td>Stores globaux et persistance</td></tr>
+    <tr><td>recharts</td><td class="mono">2.15.4</td><td>Graphiques du tableau de bord et de l'analytique</td></tr>
+    <tr><td>@fullcalendar/react</td><td class="mono">6.1.20</td><td>Agenda opérationnel</td></tr>
+    <tr><td>react-signature-canvas</td><td class="mono">1.1.0-alpha.2</td><td>Capture de signature</td></tr>
+    <tr><td>react-i18next / i18next</td><td class="mono">17.0 / 26.0</td><td>Bilingue français / arabe</td></tr>
+    <tr><td>@supabase/supabase-js</td><td class="mono">2.105.4</td><td>Présent mais non importé — dette à supprimer</td></tr>
+    <tr><td>zod</td><td class="mono">3.24</td><td>Présent mais peu utilisé côté formulaires</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">8.3</span>Volumétrie du code</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:32%">Dossier</th><th style="width:14%">Fichiers</th><th style="width:14%">Lignes</th><th>Contenu</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">src/routes</td><td>10</td><td>2 861</td><td>Les 9 écrans et le layout racine</td></tr>
+    <tr><td class="mono">src/components/ui</td><td>46</td><td>4 360</td><td>Bibliothèque shadcn/ui adaptée au thème</td></tr>
+    <tr><td class="mono">src/components/layout</td><td>8</td><td>650</td><td>Sidebar, topbar, switches, notifications</td></tr>
+    <tr><td class="mono">src/components/dashboard</td><td>4</td><td>559</td><td>KPI, revenus, occupation, agenda</td></tr>
+    <tr><td class="mono">src/components/properties</td><td>1</td><td>303</td><td>Dialogue de création de bien</td></tr>
+    <tr><td class="mono">src/components/tenants</td><td>1</td><td>164</td><td>Dialogue de création de locataire</td></tr>
+    <tr><td class="mono">src/store</td><td>4</td><td>180</td><td>Mode, thème, notifications, portefeuille</td></tr>
+    <tr><td class="mono">src/lib</td><td>3</td><td>360</td><td>i18n, Zapier, utilitaires</td></tr>
+    <tr><td><strong>Total mesuré</strong></td><td><strong>84</strong></td><td><strong>10 647</strong></td><td>Y compris point d'entrée, routeur, styles</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">8.4</span>Build, routage et diffusion</h3>
+<div class="grid2">
+  <div>
+    <h4>Chaîne de build</h4>
+    <ul class="ticks">
+      <li><span class="mono">npm ci &amp;&amp; npm run build</span> produit <span class="mono">dist/</span>.</li>
+      <li>Bundle final : 1,33 Mo de JavaScript (382 Ko gzip) et 140 Ko de CSS.</li>
+      <li>Un seul chunk principal : pas de découpage par route.</li>
+      <li>Les images de démonstration sont distantes (Unsplash), pas empaquetées.</li>
+      <li>Le déploiement copie <span class="mono">dist/</span> à la racine du site Hostinger.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Routage SPA</h4>
+    <ul class="ticks">
+      <li>9 routes déclarées via TanStack Router (fichiers de route).</li>
+      <li>Le serveur doit renvoyer <span class="mono">index.html</span> pour toute route inconnue.</li>
+      <li>Un fichier <span class="mono">.htaccess</span> assure ce repli sur Hostinger.</li>
+      <li>Sans ce repli, un accès direct à <span class="mono">/portefeuille</span> renvoie une 404.</li>
+      <li>Vérifié en production : <span class="mono">/</span>, <span class="mono">/portefeuille</span>, <span class="mono">/vitrine</span> répondent 200.</li>
+    </ul>
+  </div>
+</div>
+<div class="code"><span class="c"># .htaccess — repli SPA</span>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]</div>
+
+<h3><span class="n">8.5</span>Performance observée</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:30%">Indicateur</th><th style="width:22%">Valeur</th><th>Commentaire</th></tr></thead>
+  <tbody>
+    <tr><td>Poids JavaScript</td><td>1,33 Mo · 382 Ko gzip</td><td>Acceptable sur fibre, perfectible en 4G</td></tr>
+    <tr><td>Poids CSS</td><td>140 Ko</td><td>Tailwind 4 génère uniquement les classes utilisées</td></tr>
+    <tr><td>Découpage par route</td><td>Absent</td><td>Le premier chargement paie tout le produit</td></tr>
+    <tr><td>Navigation interne</td><td>&lt; 1 s</td><td>Routage client, pas de rechargement réseau</td></tr>
+    <tr><td>Dépendance serveur</td><td>Aucune</td><td>Latence limitée au CDN Hostinger</td></tr>
+    <tr><td>Cache</td><td>CDN + empreinte de fichier</td><td>Les assets sont versionnés par hash</td></tr>
+  </tbody>
+</table>
+<div class="callout"><span class="t">Recommandation</span>Activer le découpage par route (<span class="mono">lazyRouteComponent</span>) et le préchargement des liens TanStack pour ramener le premier chargement sous 150 Ko compressés sur les écrans les plus consultés.</div>
+
+<!-- ============================ 09 DESIGN ============================ -->
+<h2 class="sec">09 · Design system</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Liquid glassmorphism</div>
+  <div class="abstract">Une identité sombre et profonde, deux accents — cyan pour l'action, or pour la valeur — et des surfaces en verre dépoli. L'objectif est une sensation premium sans compromettre la lisibilité des données.</div>
+</div>
+
+<h3><span class="n">9.1</span>Tokens de couleur</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:20%">Token</th><th style="width:26%">Valeur OKLCH</th><th style="width:16%">Équivalent</th><th>Usage</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">--background</td><td class="mono">oklch(0.13 0.02 250)</td><td>≈ #0B0F17</td><td>Fond général sombre</td></tr>
+    <tr><td class="mono">--foreground</td><td class="mono">oklch(0.96 0.01 240)</td><td>≈ #F2F5F9</td><td>Texte principal</td></tr>
+    <tr><td class="mono">--card</td><td class="mono">oklch(0.18 0.025 250)</td><td>≈ #141B28</td><td>Surfaces de cartes</td></tr>
+    <tr><td class="mono">--primary / --cyan</td><td class="mono">oklch(0.82 0.18 210)</td><td>≈ #3CE0FF</td><td>Action, focus, liens</td></tr>
+    <tr><td class="mono">--accent</td><td class="mono">oklch(0.78 0.16 80)</td><td>≈ #F0B64F</td><td>Valeur, loyers, mise en avant</td></tr>
+    <tr><td class="mono">--muted-foreground</td><td class="mono">oklch(0.70 0.02 240)</td><td>≈ #A3B0C2</td><td>Texte secondaire</td></tr>
+    <tr><td class="mono">--border</td><td class="mono">oklch(1 0 0 / 8%)</td><td>blanc 8 %</td><td>Séparateurs et contours</td></tr>
+    <tr><td class="mono">--radius</td><td class="mono">0.875rem</td><td>14 px</td><td>Rayon de base, décliné de 10 à 26 px</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">9.2</span>Surfaces en verre</h3>
+<div class="grid2">
+  <div class="card">
+    <h4><span class="mono">.glass</span></h4>
+    <p class="small">Fond <span class="mono">rgba(18,22,32,.55)</span>, flou 20 px, saturation 140 %, bordure blanche 8 %, ombre portée profonde. Utilisé pour les cartes, la sidebar et les panneaux secondaires.</p>
+  </div>
+  <div class="card">
+    <h4><span class="mono">.glass-strong</span></h4>
+    <p class="small">Fond <span class="mono">rgba(22,28,40,.78)</span>, flou 28 px, saturation 160 %. Réservé aux dialogues, aux panneaux latéraux et aux éléments qui doivent rester lisibles au-dessus du contenu.</p>
+  </div>
+  <div class="card">
+    <h4>Micro-interactions</h4>
+    <p class="small">Élévation au survol (−2 px), halo cyan à 18 %, transitions de 150 à 400 ms. Sept animations déclarées : float, wave, shimmer, glow-pulse, fade-in, scale-in, ripple.</p>
+  </div>
+  <div class="card">
+    <h4>Thème clair</h4>
+    <p class="small">Le thème clair inverse les tokens de fond et de texte, mais conserve les surfaces vitrées pour préserver l'identité. La bascule est persistée sous <span class="mono">movia-theme</span>.</p>
+  </div>
+</div>
+
+<h3><span class="n">9.3</span>Typographie</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:22%">Rôle</th><th style="width:26%">Famille</th><th>Usage</th></tr></thead>
+  <tbody>
+    <tr><td>Display</td><td><strong>Comfortaa</strong></td><td>Titres de page, chiffres clés, marque</td></tr>
+    <tr><td>Texte</td><td><strong>Plus Jakarta Sans</strong></td><td>Interface, formulaires, tableaux</td></tr>
+    <tr><td>Technique</td><td>Monospace système</td><td>Références, montants, routes</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">9.4</span>Inventaire des composants</h3>
+<div class="grid3">
+  <div class="card"><h4>46 composants UI</h4><p class="small">Accordion, alert, avatar, badge, button, calendar, card, carousel, chart, checkbox, command, dialog, drawer, dropdown, form, input, menubar, pagination, popover, progress, radio, scroll-area, select, separator, sheet, sidebar, skeleton, slider, switch, table, tabs, textarea, toast, tooltip, etc.</p></div>
+  <div class="card"><h4>8 composants de structure</h4><p class="small">AppShell, Sidebar, Topbar, LanguageSwitcher, ModeSwitcher, ThemeToggle, NotificationsBell, LiquidIcon.</p></div>
+  <div class="card"><h4>4 composants de pilotage</h4><p class="small">StatCard, RevenueChart, OccupancyChart, AgendaCalendar — plus les deux dialogues de création (bien, locataire).</p></div>
+</div>
+
+<h3><span class="n">9.5</span>Retour utilisateur et états</h3>
+<ul class="ticks">
+  <li>Toasts Sonner pour chaque action réussie : création, mise à jour, suppression, signature, rejet de lead.</li>
+  <li>Dialogues de confirmation avant toute suppression irréversible.</li>
+  <li>États vides explicites avec icône et message, jamais un écran blanc.</li>
+  <li>Badges de statut colorés et compteurs par état.</li>
+  <li>Alertes visuelles pour les impayés et les contrats proches de l'expiration.</li>
+</ul>
+
+<h3><span class="n">9.6</span>Responsive et accessibilité</h3>
+<div class="grid2">
+  <div>
+    <h4>Responsive</h4>
+    <ul class="ticks">
+      <li>Rupture principale à 980 px : sidebar masquée ou compacte, grilles en une colonne.</li>
+      <li>Rupture secondaire à 560 px : KPI sur deux colonnes, marges réduites.</li>
+      <li>Vérifié de 430 px (mobile) à 1600 px (desktop).</li>
+      <li>Les tableaux larges deviennent des listes de cartes.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Accessibilité</h4>
+    <ul class="ticks">
+      <li>Base Radix : navigation clavier et gestion du focus dans les dialogues.</li>
+      <li>Contrastes élevés sur fond sombre pour le texte principal.</li>
+      <li>Zones cliquables généreuses, icônes accompagnées de libellés.</li>
+      <li><strong>Manques :</strong> pas de lien d'évitement, pas de supervision ARIA globale, quelques boutons icône sans libellé accessible.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================ 10 I18N ============================ -->
+<h2 class="sec">10 · Internationalisation et RTL</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Deux langues, deux directions</div>
+  <div class="abstract">Le français est la langue par défaut, l'arabe est une langue de première classe : la bascule ne traduit pas seulement les libellés, elle inverse la direction de toute la mise en page.</div>
+</div>
+
+<h3><span class="n">10.1</span>Organisation des traductions</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:20%">Langue</th><th style="width:16%">Code</th><th style="width:16%">Direction</th><th>Namespaces</th></tr></thead>
+  <tbody>
+    <tr><td>Français</td><td class="mono">fr</td><td class="mono">ltr</td><td rowspan="2">15 namespaces : app, nav, mode, theme, common, dashboard, portfolio, tenants, payments, contracts, maintenance, analytics, agenda, radar, zapier</td></tr>
+    <tr><td>Arabe</td><td class="mono">ar</td><td class="mono">rtl</td></tr>
+  </tbody>
+</table>
+<p>Le fichier <span class="mono">src/lib/i18n.ts</span> contient les deux dictionnaires (118 entrées de premier niveau, plusieurs avec des sous-clés), initialise i18next avec le français en repli et expose une fonction <span class="mono">setLanguage()</span> qui met à jour <span class="mono">document.documentElement.dir</span> et <span class="mono">lang</span>, puis mémorise le choix dans <span class="mono">localStorage</span>.</p>
+
+<h3><span class="n">10.2</span>Ce que fait concrètement la bascule RTL</h3>
+<div class="grid2">
+  <div class="card">
+    <h4>Effets vérifiés</h4>
+    <ul class="ticks">
+      <li>La sidebar passe à droite et l'ordre de lecture s'inverse.</li>
+      <li>Les marges et espacements logiques se retournent.</li>
+      <li>Les libellés de navigation sont traduits en arabe.</li>
+      <li>Les titres de modules et les actions principales suivent.</li>
+      <li>La préférence est conservée d'une session à l'autre.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Limites constatées</h4>
+    <ul class="ticks">
+      <li>Certains libellés métier restent en français (statuts, catégories, noms de contrats).</li>
+      <li>Les données de démonstration (noms, biens, quartiers) ne sont pas traduites.</li>
+      <li>Les formats de date restent au format JJ/MM/AAAA.</li>
+      <li>Aucune gestion des pluriels arabes spécifiques.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout">
+  <span class="t">Argument produit</span>
+  Le RTL complet est rare sur les CRM immobiliers destinés au Maroc. Dans une démonstration, la bascule FR → AR constitue un moment fort : elle prouve que le produit n'est pas un template occidental traduit à la hâte.
+</div>
+
+<!-- ============================ 11 SECURITE ============================ -->
+<h2 class="sec">11 · Sécurité, données et conformité</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Ce qui est protégé — et ce qui ne l'est pas</div>
+  <div class="abstract">Un dossier honnête vaut mieux qu'une promesse invérifiable. Voici la surface d'attaque réelle, les risques classés et les mesures à prendre avant toute mise en production.</div>
+</div>
+
+<h3><span class="n">11.1</span>Surface d'attaque</h3>
+<p>L'application n'a ni serveur applicatif, ni base de données, ni endpoint d'authentification. La surface exposée se limite au bundle JavaScript, au stockage local du navigateur et aux appels sortants vers des domaines tiers (Unsplash, YouTube, Vimeo, Zapier). Cela réduit fortement le risque d'intrusion serveur, mais déplace le problème : les données sensibles sont stockées en clair chez l'utilisateur et accessibles à quiconque ouvre la page.</p>
+
+<h3><span class="n">11.2</span>Registre des risques</h3>
+<table class="tbl">
+  <thead><tr><th style="width:5%">ID</th><th style="width:28%">Risque</th><th style="width:11%">Sévérité</th><th style="width:24%">Impact</th><th>Mesure recommandée</th></tr></thead>
+  <tbody>
+    <tr><td>R1</td><td>Aucune authentification</td><td><span class="tag ro">Critique</span></td><td>Accès total à l'interface et aux données pour toute personne ayant l'URL</td><td>Supabase Auth ou Clerk, session obligatoire, rôles</td></tr>
+    <tr><td>R2</td><td>Données personnelles en clair dans <span class="mono">localStorage</span></td><td><span class="tag ro">Élevé</span></td><td>CIN, téléphones et adresses lisibles via les outils du navigateur</td><td>Persistance serveur chiffrée, RLS, purge locale</td></tr>
+    <tr><td>R3</td><td>Clé API de démonstration dans le bundle</td><td><span class="tag am">Moyen</span></td><td><span class="mono">movia-secret-2026</span> visible par quiconque inspecte le JavaScript</td><td>Supprimer la valeur de repli, déplacer les secrets côté serveur</td></tr>
+    <tr><td>R4</td><td>Absence de sauvegarde</td><td><span class="tag ro">Élevé</span></td><td>Perte définitive au vidage du cache ou au changement d'appareil</td><td>Sauvegarde serveur, export, rétention</td></tr>
+    <tr><td>R5</td><td>Signature non qualifiée</td><td><span class="tag am">Moyen</span></td><td>Valeur probante limitée en cas de litige</td><td>Prestataire de signature certifiée, horodatage, piste d'audit</td></tr>
+    <tr><td>R6</td><td>Absence d'en-têtes de sécurité</td><td><span class="tag am">Moyen</span></td><td>Pas de CSP, HSTS, X-Frame-Options explicites</td><td>Configurer les en-têtes côté hébergeur</td></tr>
+    <tr><td>R7</td><td>URL de webhook Zapier exposée au build</td><td><span class="tag">Faible</span></td><td>Un tiers pourrait déclencher l'automate s'il la découvre</td><td>Relayer par un endpoint serveur authentifié</td></tr>
+    <tr><td>R8</td><td>Pas de journal d'audit</td><td><span class="tag am">Moyen</span></td><td>Impossible de savoir qui a modifié quoi</td><td>Journaliser les actions côté serveur</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">11.3</span>Données personnelles et conformité marocaine</h3>
+<p>Le produit manipule des données d'identification (nom, CIN, téléphone, e-mail, profession, nationalité) et des données patrimoniales et financières (biens, loyers, impayés). Au Maroc, ces traitements relèvent de la loi 09-08 relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel, sous le contrôle de la CNDP.</p>
+<ul class="ticks">
+  <li><strong>Finalité :</strong> la gestion locative et la transaction immobilière doivent être documentées.</li>
+  <li><strong>Minimisation :</strong> la CIN n'est pas nécessaire à l'affichage quotidien ; elle devrait être masquée par défaut.</li>
+  <li><strong>Durée de conservation :</strong> aucune politique n'est définie dans l'application.</li>
+  <li><strong>Sécurité :</strong> le stockage local en clair ne constitue pas une mesure appropriée pour des données d'identité.</li>
+  <li><strong>Droits des personnes :</strong> aucun mécanisme d'accès, de rectification ou de suppression n'existe.</li>
+</ul>
+<div class="warn"><span class="t">Vigilance</span>Si des clients ou propriétaires résident dans l'Union européenne, le RGPD peut s'appliquer en plus de la loi 09-08. Dans les deux cas, l'architecture actuelle n'est pas conforme : il faut un responsable de traitement, une base légale, un registre et des mesures de sécurité serveur.</div>
+
+<h3><span class="n">11.4</span>Valeur juridique de la signature</h3>
+<p>La signature capturée est une image du tracé, associée à un contrat stocké dans le navigateur. Elle constitue tout au plus un élément de preuve visuel. Elle ne répond pas aux exigences d'une signature électronique qualifiée : absence de certificat, d'horodatage fiable, de scellement, de vérification d'identité du signataire et de piste d'audit inaltérable.</p>
+<div class="callout"><span class="t">Formulation pour la vidéo</span>Dire « signature électronique intégrée » est acceptable au sens fonctionnel. Dire « signature légale » ou « valeur probante garantie » serait juridiquement inexact. La formulation recommandée est : « signature manuscrite numérisée, intégrée au contrat ».</div>
+
+<h3><span class="n">11.5</span>Plan d'action sécurité — priorités</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:8%">Priorité</th><th style="width:42%">Action</th><th>Effort estimé</th></tr></thead>
+  <tbody>
+    <tr><td><span class="tag ro">P0</span></td><td>Authentification et rôles, session obligatoire</td><td>3–5 jours</td></tr>
+    <tr><td><span class="tag ro">P0</span></td><td>Migration des données vers PostgreSQL avec RLS</td><td>5–8 jours</td></tr>
+    <tr><td><span class="tag ro">P0</span></td><td>Suppression de la clé API de repli et du client Supabase inutilisé</td><td>1 heure</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>En-têtes de sécurité et CSP sur l'hébergement</td><td>2 heures</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>Masquage de la CIN et journal d'audit</td><td>2 jours</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>Politique de conservation et export des données</td><td>2 jours</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================ 12 AUDIT ============================ -->
+<h2 class="sec">12 · Audit de maturité</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Ce qui est fini, ce qui est amorcé</div>
+  <div class="abstract">Chaque module est noté sur cinq selon quatre critères : couverture fonctionnelle, fiabilité des données, finition d'interface et exploitabilité réelle. La note globale mesure la maturité produit, pas la qualité du design.</div>
+</div>
+
+<h3><span class="n">12.1</span>Notation par module</h3>
+<table class="tbl">
+  <thead><tr><th style="width:23%">Module</th><th style="width:9%">Note</th><th style="width:13%">État</th><th style="width:27%">Points forts</th><th>Ce qui manque</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tableau de bord</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>KPI, agenda, deux graphiques, hiérarchie claire</td><td>Indicateurs calculés depuis les données réelles</td></tr>
+    <tr><td><strong>Portefeuille</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>CRUD, recherche, grille/tableau, photos, vidéo</td><td>Persistance, téléversement de fichiers, adresse et équipements</td></tr>
+    <tr><td><strong>Fiche bien</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Carrousel, édition en place, partage</td><td>Pièces jointes, aperçu public relié à la vitrine</td></tr>
+    <tr><td><strong>Locataires</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Dossier riche, CIN, score, filtres, archivage</td><td>Documents justificatifs, calcul du score, historique</td></tr>
+    <tr><td><strong>Paiements</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Statuts, totaux, relance WhatsApp, modes</td><td>Quittances PDF, rapprochement bancaire, source unique locataire</td></tr>
+    <tr><td><strong>Contrats</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>4 types, signature, aperçu, cycle de vie</td><td>Envoi e-mail, signature qualifiée, modèles juridiques validés</td></tr>
+    <tr><td><strong>Maintenance</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Tickets, priorités, coûts, rappels de charges</td><td>Photos, devis, planning prestataire, lien comptable</td></tr>
+    <tr><td><strong>Le Radar</strong></td><td><strong>3,5 / 5</strong></td><td><span class="tag am">Fonctionnel</span></td><td>Qualification, publication, rejet, webhook</td><td>Flux WhatsApp réel, scoring, doublons</td></tr>
+    <tr><td><strong>Analytique</strong></td><td><strong>2 / 5</strong></td><td><span class="tag am">Partiel</span></td><td>Deux visualisations soignées, intention claire</td><td>Agrégations réelles, ROI, exports, filtres</td></tr>
+    <tr><td><strong>Système</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Navigation, FR/AR, RTL, thème, notifications</td><td>Authentification, rôles, multi-agences</td></tr>
+  </tbody>
+</table>
+
+<div class="kpis" style="grid-template-columns:repeat(4,1fr)">
+  <div class="kpi"><div class="n">3,7<span style="font-size:9pt">/5</span></div><div class="l">maturité fonctionnelle moyenne</div></div>
+  <div class="kpi"><div class="n">8<span style="font-size:9pt">/10</span></div><div class="l">modules utilisables en démonstration</div></div>
+  <div class="kpi"><div class="n">0<span style="font-size:9pt">/10</span></div><div class="l">modules persistés côté serveur</div></div>
+  <div class="kpi"><div class="n">2<span style="font-size:9pt">/10</span></div><div class="l">modules avec données réellement calculées</div></div>
+</div>
+
+<h3><span class="n">12.2</span>Dette technique</h3>
+<table class="tbl">
+  <thead><tr><th style="width:7%">Priorité</th><th style="width:33%">Élément</th><th style="width:12%">Impact</th><th>Effort</th></tr></thead>
+  <tbody>
+    <tr><td><span class="tag ro">P0</span></td><td>État métier non persisté (biens, locataires, paiements, contrats, tickets)</td><td>Bloquant production</td><td>Couvert par la phase 1 (5–8 j)</td></tr>
+    <tr><td><span class="tag ro">P0</span></td><td>Absence d'authentification et de rôles</td><td>Bloquant production</td><td>3–5 j</td></tr>
+    <tr><td><span class="tag ro">P0</span></td><td>Données personnelles en clair dans le navigateur</td><td>Risque juridique</td><td>Inclus dans la migration</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>Données de démonstration codées en dur dans les composants</td><td>Maintenance</td><td>2–3 j</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>Adresse et équipements non persistés</td><td>Perte de donnée</td><td>0,5 j</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>Table locataire dupliquée dans les paiements</td><td>Cohérence</td><td>0,5 j</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>Client Supabase et clé API de repli inutilisés</td><td>Sécurité / poids</td><td>1 h</td></tr>
+    <tr><td><span class="tag">P2</span></td><td>Absence de tests automatisés et d'intégration continue</td><td>Qualité</td><td>3–4 j pour un socle</td></tr>
+    <tr><td><span class="tag">P2</span></td><td>Pas de découpage par route</td><td>Performance</td><td>1–2 j</td></tr>
+    <tr><td><span class="tag">P2</span></td><td>Pas de validation de schéma runtime sur les formulaires</td><td>Robustesse</td><td>2 j</td></tr>
+    <tr><td><span class="tag">P2</span></td><td>Libellés métier non traduits en arabe</td><td>Finition i18n</td><td>1–2 j</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">12.3</span>Qualité du code</h3>
+<div class="grid2">
+  <div class="card">
+    <h4 style="color:#127a58">Points forts</h4>
+    <ul class="ticks">
+      <li>TypeScript strict sur l'ensemble du projet.</li>
+      <li>ESLint et Prettier configurés.</li>
+      <li>Composants découpés, design system cohérent.</li>
+      <li>Routage typé, conventions de nommage stables.</li>
+      <li>Code lisible, commentaires ciblés, pas de dépendance exotique.</li>
+      <li>Bundle unique maîtrisé, pas de fuite mémoire visible.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4 style="color:#a83a55">Points faibles</h4>
+    <ul class="cross">
+      <li>Aucun test unitaire, d'intégration ou de bout en bout.</li>
+      <li>Aucune intégration continue ni vérification de build.</li>
+      <li>Pas de gestion d'erreur globale ni d'<span class="mono">ErrorBoundary</span>.</li>
+      <li>Duplication de données et de constantes entre modules.</li>
+      <li>Composants de route volumineux (jusqu'à 486 lignes).</li>
+      <li>Dépendances installées mais inutilisées.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================ 13 ROADMAP ============================ -->
+<h2 class="sec">13 · Feuille de route</h2>
+<div class="sec-head">
+  <div class="sec-kicker">De la démonstration au produit exploitable</div>
+  <div class="abstract">Trois paliers, ordonnés par valeur pour une agence. Le premier rend le produit utilisable ; le deuxième automatise l'acquisition ; le troisième prépare l'échelle.</div>
+</div>
+
+<h3><span class="n">13.1</span>Phase 1 — Consolider la base (2 à 3 semaines)</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:34%">Lot</th><th style="width:38%">Livrables</th><th>Critère d'acceptation</th></tr></thead>
+  <tbody>
+    <tr><td>Authentification et rôles</td><td>Connexion, session, rôles admin / agent / gestionnaire, écran de profil réel</td><td>Un utilisateur non connecté ne voit aucun écran métier</td></tr>
+    <tr><td>Base de données</td><td>PostgreSQL, schéma relationnel, Row Level Security, migrations</td><td>Les 8 entités sont persistées et cloisonnées par agence</td></tr>
+    <tr><td>API applicative</td><td>Endpoints biens, locataires, paiements, contrats, tickets, leads</td><td>Les écrans lisent et écrivent via l'API, plus aucun état local métier</td></tr>
+    <tr><td>Stockage de fichiers</td><td>Photos, pièces d'identité, documents de contrat</td><td>Téléversement, validation de type et de taille, URL signée</td></tr>
+    <tr><td>Documents PDF</td><td>Quittances de loyer, contrats imprimables, relevé mensuel</td><td>Génération serveur, numérotation, archivage</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">13.2</span>Phase 2 — Automatiser l'acquisition (3 à 5 semaines)</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:34%">Lot</th><th style="width:38%">Livrables</th><th>Critère d'acceptation</th></tr></thead>
+  <tbody>
+    <tr><td>Vitrine publique</td><td>Site public généré depuis les biens publiés, SEO, partage social</td><td>Un bien publié apparaît en ligne sans double saisie</td></tr>
+    <tr><td>WhatsApp Business</td><td>Réception des messages et des leads via l'API Meta</td><td>Un message entrant crée un lead dans Le Radar</td></tr>
+    <tr><td>Campagnes et ROI</td><td>Coût par lead, source, taux de conversion, retour sur investissement</td><td>Le dirigeant connaît le coût d'acquisition par canal</td></tr>
+    <tr><td>Notifications</td><td>E-mail et push : loyers en retard, contrats à renouveler, nouveau lead</td><td>Une alerte part dans les 5 minutes suivant l'événement</td></tr>
+    <tr><td>Signature renforcée</td><td>Intégration d'un prestataire certifié, horodatage, piste d'audit</td><td>Le contrat produit une preuve vérifiable</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">13.3</span>Phase 3 — Passer à l'échelle (6 à 8 semaines)</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:34%">Lot</th><th style="width:38%">Livrables</th><th>Critère d'acceptation</th></tr></thead>
+  <tbody>
+    <tr><td>Multi-agences</td><td>Organisations, équipes, tableaux consolidés, permissions fines</td><td>Chaque agence ne voit que son périmètre</td></tr>
+    <tr><td>Application mobile</td><td>React Native ou PWA installable, mode hors ligne pour les visites</td><td>Saisie d'un bien et photo depuis le terrain</td></tr>
+    <tr><td>Comptabilité</td><td>Rapprochement bancaire, exports comptables, gestion des dépenses</td><td>Le comptable exporte un journal mensuel exploitable</td></tr>
+    <tr><td>Intelligence artificielle</td><td>Estimation de loyer, tri des leads, résumé de dossier, rédaction d'annonces</td><td>Gain mesuré sur au moins un flux métier</td></tr>
+    <tr><td>Conformité et résilience</td><td>Sauvegardes, journal d'audit, politique de conservation, conformité 09-08</td><td>Restauration testée et registre des traitements à jour</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">13.4</span>Choix d'architecture recommandé</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:22%">Option</th><th style="width:34%">Avantages</th><th style="width:24%">Limites</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Supabase</strong><br /><span class="small muted">Auth + Postgres + Storage</span></td><td>Mise en route rapide, RLS native, temps réel, coût maîtrisé</td><td>Dépendance à un service, logique métier à répartir</td><td><span class="tag em">Recommandé pour la phase 1</span></td></tr>
+    <tr><td><strong>API Node dédiée</strong><br /><span class="small muted">NestJS ou Fastify + Postgres</span></td><td>Contrôle total, métier centralisé, tests serveur</td><td>Plus long à construire, hébergement à opérer</td><td><span class="tag am">Pertinent à partir de la phase 2</span></td></tr>
+    <tr><td><strong>Backend-as-a-service alternatif</strong><br /><span class="small muted">Firebase, Appwrite</span></td><td>Écosystème mature, temps réel</td><td>Modèle de données moins relationnel, coûts moins prévisibles</td><td><span class="tag">Possible, moins adapté au métier</span></td></tr>
+  </tbody>
+</table>
+<div class="ok"><span class="t">Recommandation</span>Conserver le front React existant et le brancher sur Supabase (Auth, Postgres avec RLS, Storage). Cette trajectoire maximise la valeur déjà produite, minimise le risque et permet une mise en production en trois semaines.</div>
+
+<!-- ============================ 14 EXPLOITATION ============================ -->
+<h2 class="sec">14 · Exploitation et déploiement</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Faire tourner le produit</div>
+  <div class="abstract">Un hébergement statique, un domaine, une procédure de publication en quatre commandes et aucune infrastructure à superviser. C'est la force de l'architecture actuelle.</div>
+</div>
+
+<h3><span class="n">14.1</span>Environnement de production</h3>
+<table class="tbl compact">
+  <tbody>
+    <tr><td style="width:30%"><strong>Domaine</strong></td><td class="mono">immosolver.store</td></tr>
+    <tr><td><strong>Type d'hébergement</strong></td><td>Hostinger — site statique (type « other »)</td></tr>
+    <tr><td><strong>Racine serveur</strong></td><td class="mono">/home/u696346042/domains/immosolver.store/public_html</td></tr>
+    <tr><td><strong>Compte</strong></td><td>u696346042 · commande 1008432763</td></tr>
+    <tr><td><strong>HTTPS</strong></td><td>Actif, certificat géré par l'hébergeur</td></tr>
+    <tr><td><strong>Assets</strong></td><td>Servis par le CDN Hostinger, empreinte de fichier</td></tr>
+    <tr><td><strong>Repli SPA</strong></td><td class="mono">.htaccess</td></tr>
+    <tr><td><strong>Coût récurrent</strong></td><td>Domaine ≈ 120 MAD/an · hébergement mutualisé déjà en compte · 0 serveur</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">14.2</span>Procédure de publication</h3>
+<ol class="ticks" style="padding-left:0">
+  <li>Récupérer la version validée du dépôt <span class="mono">movia-glass-os</span>.</li>
+  <li>Installer les dépendances : <span class="mono">npm ci</span>.</li>
+  <li>Construire : <span class="mono">npm run build</span> — le résultat est dans <span class="mono">dist/</span>.</li>
+  <li>Vérifier localement : <span class="mono">npm run preview</span>, puis parcourir les 9 routes.</li>
+  <li>Déployer le contenu de <span class="mono">dist/</span> sur <span class="mono">immosolver.store</span>.</li>
+  <li>Contrôler : page d'accueil, un asset JS, <span class="mono">/portefeuille</span>, <span class="mono">/descriptif/</span>.</li>
+</ol>
+<div class="code"><span class="c"># Build et vérification locale</span>
+npm ci
+npm run build
+npm run preview
+
+<span class="c"># Contrôles post-déploiement</span>
+curl -I https://immosolver.store/
+curl -I https://immosolver.store/portefeuille
+curl -I https://immosolver.store/descriptif/</div>
+
+<h3><span class="n">14.3</span>Sauvegarde et retour arrière</h3>
+<ul class="ticks">
+  <li>Une copie de l'ancien contenu du domaine est conservée hors ligne avant chaque remplacement.</li>
+  <li>Le déploiement statique écrase le contenu : ne jamais publier sans avoir identifié le domaine.</li>
+  <li>Le retour arrière consiste à redéployer l'archive précédente à la racine du site.</li>
+  <li>Les données métier n'étant pas sur le serveur, aucune sauvegarde de base n'est nécessaire aujourd'hui — et aucune restauration n'est possible en cas de perte locale.</li>
+</ul>
+<div class="warn"><span class="t">Règle d'exploitation</span>Avant chaque déploiement : vérifier le domaine cible, archiver le contenu existant, déployer, puis contrôler les routes critiques. Un déploiement statique n'est pas réversible sans sauvegarde préalable.</div>
+
+<h3><span class="n">14.4</span>Supervision recommandée</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:26%">Besoin</th><th style="width:28%">Outil</th><th>Mise en œuvre</th></tr></thead>
+  <tbody>
+    <tr><td>Disponibilité</td><td>UptimeRobot ou Better Stack</td><td>Contrôle HTTP toutes les 5 minutes sur <span class="mono">/</span> et <span class="mono">/descriptif/</span></td></tr>
+    <tr><td>Erreurs front</td><td>Sentry</td><td>Initialisation dans le point d'entrée, source maps publiées</td></tr>
+    <tr><td>Audience</td><td>Plausible ou Umami</td><td>Script léger, sans cookie, conforme par défaut</td></tr>
+    <tr><td>Performance</td><td>PageSpeed Insights</td><td>Contrôle mensuel mobile et desktop</td></tr>
+    <tr><td>Certificat</td><td>Supervision hébergeur</td><td>Alerte avant expiration</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">14.5</span>Checklist de mise en production réelle</h3>
+<ul class="chk">
+  <li>Authentification active et session obligatoire sur toutes les routes métier.</li>
+  <li>Rôles et permissions vérifiés côté serveur, pas seulement dans l'interface.</li>
+  <li>Base PostgreSQL migrée, RLS activée, sauvegardes quotidiennes testées.</li>
+  <li>Données personnelles chiffrées au repos et masquées à l'affichage.</li>
+  <li>Politique de conservation et registre des traitements documentés.</li>
+  <li>En-têtes de sécurité configurés : CSP, HSTS, X-Frame-Options, Referrer-Policy.</li>
+  <li>Signature électronique conforme ou mention explicite de sa valeur limitée.</li>
+  <li>Tests de bout en bout sur les cinq parcours critiques.</li>
+  <li>Supervision des erreurs et de la disponibilité opérationnelle.</li>
+  <li>Procédure de retour arrière documentée et testée.</li>
+  <li>Mentions légales, conditions d'utilisation et politique de confidentialité publiées.</li>
+  <li>Formation des utilisateurs et support de premier niveau définis.</li>
+</ul>
+
+<!-- ============================ 15 VIDEO ============================ -->
+<h2 class="sec">15 · Guide d'intégration de la vidéo</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Production et intégration</div>
+  <div class="abstract">Tout ce qu'il faut pour produire une démonstration crédible de 2 min 30 et l'intégrer dans la page produit sans toucher au design.</div>
+</div>
+
+<h3><span class="n">15.1</span>Spécifications techniques</h3>
+<table class="tbl compact">
+  <tbody>
+    <tr><td style="width:28%"><strong>Résolution</strong></td><td>1920 × 1080 (16:9), export 1080p</td></tr>
+    <tr><td><strong>Fréquence</strong></td><td>30 images par seconde</td></tr>
+    <tr><td><strong>Codec</strong></td><td>H.264, profil High, débit 8 à 12 Mbit/s</td></tr>
+    <tr><td><strong>Audio</strong></td><td>AAC 48 kHz, voix normalisée à −16 LUFS, musique à −24 LUFS</td></tr>
+    <tr><td><strong>Durée cible</strong></td><td>2 min 30 (maximum 3 min)</td></tr>
+    <tr><td><strong>Poids</strong></td><td>Moins de 200 Mo pour un hébergement direct, ou publication YouTube / Vimeo / Loom</td></tr>
+    <tr><td><strong>Sous-titres</strong></td><td>Français incrustés ou piste SRT séparée</td></tr>
+    <tr><td><strong>Cadrage</strong></td><td>Navigateur en 1600 × 1000, zoom 100 %, barre d'URL masquée ou propre</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">15.2</span>Intégration dans la page</h3>
+<p>La page <span class="mono">/descriptif/</span> contient un cadre 16:9 responsive avec une iframe de remplacement. Il suffit de remplacer la valeur <span class="mono">src="about:blank"</span> par l'URL de la vidéo, puis de supprimer le bloc de substitution visuel.</p>
+<div class="code"><span class="c">&lt;!-- Fichier : descriptif/index.html — section #video --&gt;</span>
+&lt;div class="video-wrap"&gt;
+  &lt;iframe
+    src="https://www.youtube.com/embed/VIDEO_ID"
+    title="Démonstration ImmoSolver"
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen&gt;
+  &lt;/iframe&gt;
+&lt;/div&gt;</div>
+<ul class="ticks">
+  <li>Conserver l'attribut <span class="mono">title</span> : il est requis pour l'accessibilité.</li>
+  <li>Ajouter <span class="mono">loading="lazy"</span> pour ne pas pénaliser le premier chargement.</li>
+  <li>Supprimer le bloc <span class="mono">.video-ph</span> une fois la vidéo en place.</li>
+  <li>Vérifier le rendu mobile : le cadre reste en 16:9, sans débordement.</li>
+  <li>Si la vidéo est hébergée en MP4, utiliser une balise <span class="mono">&lt;video controls playsinline&gt;</span> à la place de l'iframe.</li>
+</ul>
+
+<h3><span class="n">15.3</span>Storyboard — 12 plans</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:9%">Timecode</th><th style="width:20%">Écran</th><th style="width:38%">Action filmée</th><th>Message clé</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">0:00–0:08</td><td>Logo / accueil</td><td>Fondu depuis le logo vers le tableau de bord</td><td>« Voici le poste de pilotage de votre agence. »</td></tr>
+    <tr><td class="mono">0:08–0:22</td><td>Tableau de bord</td><td>Survol des KPI, puis de l'agenda</td><td>Revenus, impayés, occupation, rendez-vous : tout est visible.</td></tr>
+    <tr><td class="mono">0:22–0:38</td><td>Portefeuille</td><td>Recherche « Malabata », ouverture d'une fiche</td><td>Un bien se retrouve en quelques lettres.</td></tr>
+    <tr><td class="mono">0:38–0:52</td><td>Fiche bien</td><td>Carrousel photo, onglet vidéo, édition</td><td>Photos et visite filmée au même endroit.</td></tr>
+    <tr><td class="mono">0:52–1:06</td><td>Paiements</td><td>Ouverture d'un impayé, clic WhatsApp</td><td>Le loyer en retard devient une action immédiate.</td></tr>
+    <tr><td class="mono">1:06–1:22</td><td>Contrats</td><td>Ouverture d'un bail, signature au stylet</td><td>Le contrat se signe sans imprimante.</td></tr>
+    <tr><td class="mono">1:22–1:34</td><td>Maintenance</td><td>Création d'un ticket, priorité haute</td><td>Chaque incident est tracé, chiffré, suivi.</td></tr>
+    <tr><td class="mono">1:34–1:48</td><td>Le Radar</td><td>Aperçu d'un lead, clic « Publier »</td><td>Un message WhatsApp devient un bien au portefeuille.</td></tr>
+    <tr><td class="mono">1:48–2:00</td><td>Mode vente</td><td>Bascule locatif → vente</td><td>Un seul outil pour les deux métiers.</td></tr>
+    <tr><td class="mono">2:00–2:12</td><td>Version arabe</td><td>Bascule FR → AR, interface en RTL</td><td>Pensé pour le marché marocain, jusqu'à la direction de lecture.</td></tr>
+    <tr><td class="mono">2:12–2:22</td><td>Mobile</td><td>Vue 430 px, navigation compacte</td><td>Utilisable en visite, depuis le téléphone.</td></tr>
+    <tr><td class="mono">2:22–2:30</td><td>Carton final</td><td>Logo, URL, mention « démonstration »</td><td>« immosolver.store — votre agence dans un onglet. »</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">15.4</span>Script voix off</h3>
+<div class="card">
+  <p class="small"><strong>Séquence 1 — Ouverture (0:00–0:08).</strong> « Toute agence immobilière vit au rythme de trois questions : quels biens avons-nous, quels loyers rentrent, quels clients attendent une réponse. ImmoSolver réunit les trois dans un seul écran. »</p>
+  <p class="small"><strong>Séquence 2 — Pilotage (0:08–0:22).</strong> « Le tableau de bord donne la situation du jour : les revenus, les impayés, le taux d'occupation et l'agenda des visites et des signatures. Sans attendre un rapport, sans ouvrir un tableur. »</p>
+  <p class="small"><strong>Séquence 3 — Patrimoine (0:22–0:52).</strong> « Le portefeuille rassemble tous les biens, à louer comme à vendre. Une recherche, et la fiche s'ouvre : photos, surface, prix, description, visite filmée. L'agent a tout sous la main, même en rendez-vous. »</p>
+  <p class="small"><strong>Séquence 4 — Encaissement (0:52–1:06).</strong> « Côté gestion, chaque loyer porte un statut. Un impayé apparaît en rouge, et un clic prépare la relance WhatsApp avec le bien, le mois et le montant. Le gestionnaire ne rédige plus, il agit. »</p>
+  <p class="small"><strong>Séquence 5 — Contrat (1:06–1:22).</strong> « Le bail est généré, relu, puis signé directement à l'écran, au doigt ou au stylet. La signature reste attachée au contrat, prête à être imprimée ou archivée. »</p>
+  <p class="small"><strong>Séquence 6 — Exploitation et acquisition (1:22–1:48).</strong> « La maintenance suit chaque intervention, son prestataire et son coût. Le Radar, lui, transforme les annonces et les demandes reçues sur WhatsApp en biens publiés au portefeuille. »</p>
+  <p class="small"><strong>Séquence 7 — Deux métiers, deux langues (1:48–2:12).</strong> « Un commutateur bascule toute l'agence en mode vente : contrats, vocabulaire, indicateurs. Un autre passe l'interface en arabe, avec une mise en page entièrement inversée. »</p>
+  <p class="small"><strong>Séquence 8 — Conclusion (2:12–2:30).</strong> « Sur ordinateur comme sur téléphone, ImmoSolver donne à l'agence un seul endroit pour travailler. La démonstration est en ligne sur immosolver.store. »</p>
+</div>
+
+<h3><span class="n">15.5</span>Checklist avant publication</h3>
+<ul class="chk">
+  <li>Les données affichées sont cohérentes (pas de « Test Client » ni de montant incohérent).</li>
+  <li>Aucune information personnelle réelle n'apparaît à l'écran.</li>
+  <li>La mention « démonstration » figure au début ou à la fin.</li>
+  <li>Le mode et la langue de départ sont ceux prévus par le storyboard.</li>
+  <li>Le curseur est visible et les clics sont volontairement lents.</li>
+  <li>Le son est normalisé et la musique ne couvre pas la voix.</li>
+  <li>Les sous-titres français sont relus.</li>
+  <li>L'iframe est testée sur mobile et sur desktop.</li>
+  <li>Le lecteur ne bloque pas le premier chargement de la page.</li>
+  <li>Le carton final affiche l'URL exacte et le bon domaine.</li>
+</ul>
+
+<!-- ============================ 16 ANNEXES ============================ -->
+<h2 class="sec">16 · Annexes</h2>
+<div class="sec-head">
+  <div class="sec-kicker">Références</div>
+  <div class="abstract">Routes, dépendances, captures, glossaire et traçabilité du document.</div>
+</div>
+
+<h3><span class="n">16.1</span>Table des routes</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:18%">Route</th><th style="width:22%">Écran</th><th style="width:14%">Mode</th><th>Contenu principal</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">/</td><td>Tableau de bord</td><td>Les deux</td><td>KPI, agenda, revenus, occupation</td></tr>
+    <tr><td class="mono">/portefeuille</td><td>Portefeuille</td><td>Les deux</td><td>Liste des biens, fiche, création, édition</td></tr>
+    <tr><td class="mono">/locataires</td><td>Locataires</td><td>Location</td><td>Dossiers, filtres, scores, archivage</td></tr>
+    <tr><td class="mono">/paiements</td><td>Paiements</td><td>Location</td><td>Loyers, statuts, relances, totaux</td></tr>
+    <tr><td class="mono">/contrats</td><td>Contrats</td><td>Les deux</td><td>Baux, mandats, engagements, compromis, signature</td></tr>
+    <tr><td class="mono">/maintenance</td><td>Maintenance</td><td>Location</td><td>Tickets, priorités, charges</td></tr>
+    <tr><td class="mono">/analytique</td><td>Analytique</td><td>Les deux</td><td>Revenus, occupation, performance</td></tr>
+    <tr><td class="mono">/radar</td><td>Le Radar</td><td>Partagé</td><td>Leads, qualification, publication</td></tr>
+    <tr><td class="mono">/vitrine</td><td>Vitrine publique</td><td>Partagé</td><td>Écran d'attente « Phase 2 »</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">16.2</span>Dépendances principales</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:30%">Paquet</th><th style="width:14%">Version</th><th>Usage</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">react / react-dom</td><td>19.1.0</td><td>Interface</td></tr>
+    <tr><td class="mono">@tanstack/react-router</td><td>1.121.2</td><td>Routage typé</td></tr>
+    <tr><td class="mono">zustand</td><td>5.0.13</td><td>État global</td></tr>
+    <tr><td class="mono">tailwindcss</td><td>4.2.1</td><td>Styles utilitaires</td></tr>
+    <tr><td class="mono">recharts</td><td>2.15.4</td><td>Graphiques</td></tr>
+    <tr><td class="mono">@fullcalendar/react</td><td>6.1.20</td><td>Agenda</td></tr>
+    <tr><td class="mono">react-signature-canvas</td><td>1.1.0-alpha.2</td><td>Signature</td></tr>
+    <tr><td class="mono">react-i18next</td><td>17.0.7</td><td>Traductions</td></tr>
+    <tr><td class="mono">sonner</td><td>2.0.7</td><td>Notifications toast</td></tr>
+    <tr><td class="mono">lucide-react</td><td>0.475.0</td><td>Icônes</td></tr>
+    <tr><td class="mono">embla-carousel-react</td><td>8.6.0</td><td>Carrousel photo</td></tr>
+    <tr><td class="mono">zod</td><td>3.24.2</td><td>Validation (peu utilisée)</td></tr>
+    <tr><td class="mono">@supabase/supabase-js</td><td>2.105.4</td><td>Non utilisé</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">16.3</span>Captures de l'application</h3>
+<div class="gallery">
+  <figure><img src="assets/01-dashboard.jpg" alt="Tableau de bord" /><figcaption>01 · Tableau de bord — mode locatif</figcaption></figure>
+  <figure><img src="assets/02-portefeuille.jpg" alt="Portefeuille" /><figcaption>02 · Portefeuille — vue grille</figcaption></figure>
+  <figure><img src="assets/03-bien-detail.jpg" alt="Fiche bien" /><figcaption>03 · Fiche bien — galerie et édition</figcaption></figure>
+  <figure><img src="assets/04-locataires.jpg" alt="Locataires" /><figcaption>04 · Locataires — dossiers et filtres</figcaption></figure>
+  <figure><img src="assets/05-paiements.jpg" alt="Paiements" /><figcaption>05 · Paiements — statuts et relances</figcaption></figure>
+  <figure><img src="assets/06-contrats.jpg" alt="Contrats" /><figcaption>06 · Contrats — cycle de vie et signature</figcaption></figure>
+  <figure><img src="assets/07-maintenance.jpg" alt="Maintenance" /><figcaption>07 · Maintenance — tickets et priorités</figcaption></figure>
+  <figure><img src="assets/08-maintenance-charges.jpg" alt="Rappels de charges" /><figcaption>08 · Maintenance — rappels de charges</figcaption></figure>
+  <figure><img src="assets/09-radar.jpg" alt="Le Radar" /><figcaption>09 · Le Radar — leads entrants</figcaption></figure>
+  <figure><img src="assets/10-analytique.jpg" alt="Analytique" /><figcaption>10 · Analytique — revenus et zones</figcaption></figure>
+  <figure><img src="assets/11-mode-vente.jpg" alt="Mode vente" /><figcaption>11 · Mode vente — tableau de bord</figcaption></figure>
+  <figure><img src="assets/12-mode-vente-portefeuille.jpg" alt="Portefeuille vente" /><figcaption>12 · Mode vente — portefeuille</figcaption></figure>
+  <figure><img src="assets/13-arabe-rtl.jpg" alt="Interface arabe" /><figcaption>13 · Interface arabe — RTL</figcaption></figure>
+  <figure><img src="assets/14-mobile.jpg" alt="Vue mobile" /><figcaption>14 · Vue mobile — 430 px</figcaption></figure>
+</div>
+
+<h3><span class="n">16.4</span>Glossaire</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:22%">Terme</th><th>Définition dans le contexte du produit</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Bien</strong></td><td>Unité immobilière du portefeuille, identifiée par BIEN-XXXX.</td></tr>
+    <tr><td><strong>Lead</strong></td><td>Annonce de propriétaire ou demande de client, avant qualification.</td></tr>
+    <tr><td><strong>Mandat</strong></td><td>Contrat autorisant l'agence à gérer un bien ou à le commercialiser.</td></tr>
+    <tr><td><strong>Bail</strong></td><td>Contrat de location entre bailleur et locataire.</td></tr>
+    <tr><td><strong>Compromis</strong></td><td>Contrat de vente engageant l'acquéreur et le vendeur.</td></tr>
+    <tr><td><strong>Impayé</strong></td><td>Loyer attendu non encaissé à l'échéance.</td></tr>
+    <tr><td><strong>Reste dû</strong></td><td>Montant attendu moins montant encaissé.</td></tr>
+    <tr><td><strong>Score de fiabilité</strong></td><td>Note 0–100 attribuée manuellement à un locataire.</td></tr>
+    <tr><td><strong>RTL</strong></td><td>Sens de lecture de droite à gauche, utilisé pour l'arabe.</td></tr>
+    <tr><td><strong>Store</strong></td><td>État global Zustand partagé entre les écrans.</td></tr>
+    <tr><td><strong>SPA</strong></td><td>Application mono-page : le navigateur change d'écran sans recharger.</td></tr>
+    <tr><td><strong>Phase 2</strong></td><td>Fonction annoncée dans l'interface mais non implémentée.</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="n">16.5</span>Traçabilité du document</h3>
+<table class="tbl compact">
+  <tbody>
+    <tr><td style="width:26%"><strong>Source analysée</strong></td><td>Dépôt <span class="mono">movia-glass-os</span> — 84 fichiers, 10 647 lignes</td></tr>
+    <tr><td><strong>Application de référence</strong></td><td><span class="mono">https://immosolver.store/</span> — version déployée le 5 novembre 2026</td></tr>
+    <tr><td><strong>Méthode</strong></td><td>Lecture du code, exécution des parcours, captures sur l'application en production</td></tr>
+    <tr><td><strong>Captures</strong></td><td>14 écrans, 1600 × 1000 (desktop) et 430 × 932 (mobile)</td></tr>
+    <tr><td><strong>Version</strong></td><td>1.0 — finale</td></tr>
+    <tr><td><strong>Date</strong></td><td>5 novembre 2026</td></tr>
+    <tr><td><strong>Diffusion</strong></td><td>Interne — direction, produit, développement, production vidéo</td></tr>
+  </tbody>
+</table>
+
+<div class="sig">
+  <div><div class="line">Responsable produit</div></div>
+  <div><div class="line">Responsable technique</div></div>
+</div>
+
+<div style="margin-top:26px; border-top:2px solid #e3eaf3; padding-top:14px" class="small muted">
+  <strong style="color:#0b1b33">ImmoSolver — Spécification fonctionnelle et technique · v1.0 · 5 novembre 2026.</strong><br />
+  Application : https://immosolver.store/ · Dossier produit : https://immosolver.store/descriptif/ · Dépôt de la spécification : https://github.com/solver492/immosolver-spec<br />
+  Document établi à partir du code source et de l'application déployée. Les données affichées dans les captures sont des données de démonstration.
+</div>
+
+</body>
+</html>
