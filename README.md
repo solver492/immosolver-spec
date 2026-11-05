@@ -8,7 +8,7 @@ Document de référence du produit **ImmoSolver**, établi à partir du code sou
 |---|---|
 | **Application déployée** | <https://immosolver.store/> |
 | **Dossier produit en ligne** | <https://immosolver.store/descriptif/> |
-| **PDF de la spécification** | [`spec.pdf`](./spec.pdf) — 44 pages, A4, 3,8 Mo |
+| **PDF de la spécification** | [`spec.pdf`](./spec.pdf) — 43 pages, A4, 3,8 Mo |
 | **Source imprimable** | [`spec.html`](./spec.html) — HTML + CSS d'impression |
 | **Captures** | [`assets/`](./assets) — 14 écrans de l'application |
 | **Date** | 5 novembre 2026 |
@@ -17,7 +17,7 @@ Document de référence du produit **ImmoSolver**, établi à partir du code sou
 
 ## Télécharger
 
-- **PDF complet (44 pages)** : [`spec.pdf`](./spec.pdf)
+- **PDF complet (43 pages)** : [`spec.pdf`](./spec.pdf)
 - **Version imprimable / convertible** : [`spec.html`](./spec.html) — ouvrir dans un navigateur puis « Imprimer → Enregistrer en PDF ». Les captures sont dans `assets/`, à conserver à côté du fichier HTML.
 - **Version en ligne** : <https://immosolver.store/descriptif/spec.pdf>
 
@@ -145,7 +145,7 @@ Ou plus simplement : ouvrir `spec.html` dans Chrome / Edge, `Imprimer`, format A
 ```
 .
 ├── README.md          # ce document
-├── spec.pdf           # spécification complète, 44 pages A4
+├── spec.pdf           # spécification complète, 43 pages A4
 ├── spec.html          # source imprimable (CSS d'impression inclus)
 └── assets/            # 14 captures de l'application déployée
     ├── 01-dashboard.jpg

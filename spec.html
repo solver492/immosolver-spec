@@ -120,6 +120,8 @@
   table.tbl td strong { color: #0b1b33; }
   table.tbl .mono { font-size: 7.4pt; }
   table.tbl.compact td, table.tbl.compact th { padding: 4px 6px; }
+  table.tbl.tight td, table.tbl.tight th { padding: 3px 6px; }
+  table.tbl.tight { font-size: 8pt; }
   table.tbl thead { display: table-header-group; }
   table.tbl tr { break-inside: avoid; }
 
@@ -934,9 +936,9 @@
   <div class="step"><div class="n">JOUR 1</div><div class="t">Paramétrer</div><div class="d">Choisir le mode, la langue et le thème. Aucune configuration serveur n'est nécessaire.</div></div>
   <div class="step"><div class="n">JOUR 1</div><div class="t">Importer</div><div class="d">Saisir les premiers biens, locataires et contrats en cours. Les données restent dans le navigateur.</div></div>
   <div class="step"><div class="n">JOUR 2</div><div class="t">Exploiter</div><div class="d">Suivre les loyers, les tickets et les leads. Former l'équipe aux quatre gestes quotidiens.</div></div>
-  <div class="step"><div class="n">JOUR 3</div><div class="t">Constater</div><div class="d">Mesurer la limite : sans serveur, les données ne sont pas partagées entre appareils.</div></div>
+  <div class="step"><div class="n">JOUR 3</div><div class="t">Constater</div><div class="d">Sans serveur, chaque navigateur garde ses propres données : vider le cache efface le travail. Ce parcours décrit une démonstration, pas un déploiement client.</div></div>
 </div>
-<div class="warn"><span class="t">Point de vigilance</span>La mise en route réelle est impossible en l'état : chaque navigateur possède ses propres données, et vider le cache efface le travail. Ce parcours décrit l'usage de démonstration, pas un déploiement client.</div>
+
 
 <!-- ============================ 07 MODELE DE DONNEES ============================ -->
 <h2 class="sec">07 · Modèle de données</h2>
@@ -1019,7 +1021,7 @@
 </ul>
 
 <h3><span class="n">7.5</span>Anomalies de modèle à corriger</h3>
-<table class="tbl compact">
+<table class="tbl compact tight">
   <thead><tr><th style="width:8%">ID</th><th style="width:34%">Anomalie</th><th style="width:12%">Impact</th><th>Correction recommandée</th></tr></thead>
   <tbody>
     <tr><td>A1</td><td>Adresse du bien collectée mais absente du type <span class="mono">PropertyData</span></td><td>Perte de donnée</td><td>Ajouter <span class="mono">address</span> au type et au payload de création</td></tr>
