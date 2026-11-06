@@ -248,7 +248,7 @@
 <div class="toc">
   <div class="toc-part">Comprendre le produit</div>
   <div class="toc-row"><span class="num">01</span><span>Résumé exécutif<span class="sub">Fiche d'identité, chiffres clés, périmètre réel, ce que le produit fait et ne fait pas</span></span><span class="flag">Stratégie</span></div>
-  <div class="toc-row"><span class="num">02</span><span>Contexte et problème métier<span class="sub">Douleurs terrain, promesse, principes de conception</span></span><span class="flag">Stratégie</span></div>
+  <div class="toc-row"><span class="num">02</span><span>Contexte et problème métier<span class="sub">Poste de travail de l'agent, douleurs terrain, promesse, principes</span></span><span class="flag">Stratégie</span></div>
   <div class="toc-row"><span class="num">03</span><span>Utilisateurs et rôles<span class="sub">Personas, matrice des droits théorique et réalité de l'accès</span></span><span class="flag">Produit</span></div>
   <div class="toc-row"><span class="num">04</span><span>Cartographie fonctionnelle<span class="sub">Les 10 modules, la navigation contextuelle, le cycle de vie de la donnée</span></span><span class="flag">Produit</span></div>
 
@@ -289,6 +289,9 @@
     <tr><td style="width:34%"><strong>Nom affiché dans l'application</strong></td><td>IMMOSOLVER — CRM Immobilier</td></tr>
     <tr><td><strong>Marque exploitante</strong></td><td>IMMOSOLVER (sidebar et profil administrateur)</td></tr>
     <tr><td><strong>Nom du dossier et du domaine</strong></td><td>ImmoSolver — <span class="mono">immosolver.store</span></td></tr>
+    <tr><td><strong>Mode d'exploitation</strong></td><td>Application installée localement sur la tablette ou le mobile de l'agent (PWA), utilisée en visite et en rendez-vous ; les données de travail restent sur l'appareil</td></tr>
+    <tr><td><strong>Entrée des biens</strong></td><td>WhatsApp : l'agent de terrain envoie sa prospection au numéro de l'agence affiché dans l'application ; le bien est créé dans l'app. Tous les autres modules sont alimentés par saisie manuelle</td></tr>
+    <tr><td><strong>Sortie / diffusion</strong></td><td>Publication des annonces via Zapier — portails, réseaux sociaux et vitrine</td></tr>
     <tr><td><strong>Nature</strong></td><td>Application web mono-page (SPA), 100 % front-end</td></tr>
     <tr><td><strong>Métier couvert</strong></td><td>Gestion locative, recouvrement des loyers, maintenance, transaction vente, qualification de leads</td></tr>
     <tr><td><strong>Marché cible</strong></td><td>Agences immobilières indépendantes au Maroc — jeu de données et zones centrés sur Tanger</td></tr>
@@ -298,7 +301,7 @@
     <tr><td><strong>Persistance</strong></td><td><span class="mono">localStorage</span> pour le mode, le thème et les notifications ; état métier en mémoire et store non persisté</td></tr>
     <tr><td><strong>Authentification</strong></td><td>Aucune — profil « Adil M. · Administrateur » décoratif</td></tr>
     <tr><td><strong>Base de données</strong></td><td>Aucune. Client Supabase généré mais importé nulle part</td></tr>
-    <tr><td><strong>Intégrations</strong></td><td>WhatsApp par liens <span class="mono">wa.me</span>, webhook Zapier optionnel, embeds YouTube / Vimeo, photos Unsplash (démonstration)</td></tr>
+    <tr><td><strong>Intégrations</strong></td><td>WhatsApp par liens <span class="mono">wa.me</span> (relances), webhook Zapier (publication), embeds YouTube / Vimeo, photos Unsplash (démonstration)</td></tr>
     <tr><td><strong>Volumétrie</strong></td><td>84 fichiers source · 10 647 lignes · 10 modules · 9 écrans · 46 composants d'interface</td></tr>
     <tr><td><strong>État</strong></td><td>Démonstrateur avancé et crédible — prêt pour la démonstration, non prêt pour une exploitation réelle sans socle serveur</td></tr>
   </tbody>
@@ -345,6 +348,11 @@
 </div>
 
 <div class="callout">
+  <span class="t">Modèle d'exploitation visé</span>
+  L'application doit être installée localement sur la tablette ou le mobile de chaque agent. Les biens immobiliers entrent par WhatsApp : le numéro de l'agence est affiché dans l'app et les agents de terrain y envoient leur prospection (photos, adresse, prix, contact) ; le bien apparaît ensuite dans l'application. Le reste — locataires, paiements, contrats, maintenance — demeure en saisie manuelle. La sortie du système est la publication des annonces via Zapier.
+</div>
+
+<div class="callout">
   <span class="t">Lecture honnête</span>
   La valeur démontrée est réelle : les flux principaux fonctionnent, l'interface est aboutie et le produit raconte une histoire crédible à un dirigeant d'agence. Mais l'application ne conserve pas les données métier au-delà de la session et n'identifie pas ses utilisateurs. Toute mise en production réelle exige le socle décrit au chapitre 13.
 </div>
@@ -360,7 +368,25 @@
 <p>Une agence type à Tanger réunit trois à dix agents, un gestionnaire locatif et un dirigeant. Elle suit simultanément des biens à louer, des biens à vendre, des propriétaires bailleurs, des candidats locataires, des acquéreurs et des prestataires. Les annonces arrivent par WhatsApp, les visites se planifient par téléphone, les loyers se vérifient sur des relevés bancaires et les contrats s'impriment chez le notaire ou dans un cabinet.</p>
 <p>Le résultat est prévisible : l'information est fragmentée, les relances dépendent de la mémoire, les leads refroidissent et le dirigeant ne dispose d'aucune vue consolidée sans demander un tableau à quelqu'un. Le problème n'est pas l'absence de logiciel — c'est que les logiciels existants sont soit comptables, soit américains, soit trop lourds pour une agence de terrain.</p>
 
-<h3><span class="n">2.2</span>Cinq douleurs, cinq réponses</h3>
+<h3><span class="n">2.2</span>Le poste de travail de l'agent : tablette, WhatsApp, Zapier</h3>
+<p>L'unité de travail n'est pas le bureau : c'est la tablette que l'agent emporte en visite. ImmoSolver doit donc s'installer localement sur l'appareil, s'ouvrir comme une application et rester utilisable quand le réseau est incertain. Le modèle d'exploitation tient en trois gestes.</p>
+<div class="grid3">
+  <div class="card">
+    <h4>01 · Installer</h4>
+    <p>L'application s'installe sur la tablette ou le mobile (PWA : manifeste, service worker, écran d'accueil). Elle démarre en plein écran, sans barre d'URL, et conserve les données de travail sur l'appareil.</p>
+  </div>
+  <div class="card">
+    <h4>02 · Recevoir par WhatsApp</h4>
+    <p>Le numéro WhatsApp de l'agence est affiché dans l'application. En visite, l'agent y envoie sa prospection — photos, adresse, surface, prix, contact. Le message crée un bien dans l'application ; le reste du CRM se saisit à la main.</p>
+  </div>
+  <div class="card">
+    <h4>03 · Publier par Zapier</h4>
+    <p>La publication est la porte de sortie : un bien validé part par Zapier vers les portails, les réseaux sociaux et la vitrine, sans double saisie ni copier-coller.</p>
+  </div>
+</div>
+<p class="small muted">Cette chaîne fixe le périmètre : WhatsApp est le canal d'entrée des biens, Zapier le canal de sortie des annonces. Les locataires, paiements, contrats et tickets restent des saisies manuelles dans l'application.</p>
+
+<h3><span class="n">2.3</span>Cinq douleurs, cinq réponses</h3>
 <table class="tbl">
   <thead><tr><th style="width:31%">Douleur observée</th><th style="width:36%">Conséquence opérationnelle</th><th>Réponse dans ImmoSolver</th></tr></thead>
   <tbody>
@@ -372,10 +398,10 @@
   </tbody>
 </table>
 
-<h3><span class="n">2.3</span>La promesse</h3>
+<h3><span class="n">2.4</span>La promesse</h3>
 <p class="lead">« Une agence immobilière tient dans un onglet. » La promesse n'est pas d'automatiser le métier, mais de réunir dans un même geste ce qui est aujourd'hui éparpillé : le bien, le client, le contrat, le loyer et l'incident. Le produit ne remplace ni le notaire, ni le comptable, ni le terrain — il remplace la dispersion.</p>
 
-<h3><span class="n">2.4</span>Cinq principes de conception</h3>
+<h3><span class="n">2.5</span>Cinq principes de conception</h3>
 <div class="grid3">
   <div class="card"><h4>Un seul modèle de biens</h4><p class="small">La location et la vente partagent la même base. Le mode change le vocabulaire, la navigation et les contrats — jamais les données.</p></div>
   <div class="card"><h4>Le geste avant l'écran</h4><p class="small">Chaque écran répond à une action concrète : publier un bien, relancer un loyer, signer un bail, clôturer un ticket.</p></div>
@@ -472,7 +498,7 @@
 
 <h3><span class="n">4.3</span>Le cycle de vie d'une donnée</h3>
 <div class="flow">
-  <div class="step"><div class="n">ÉTAPE 01</div><div class="t">Lead entrant</div><div class="d">Annonce propriétaire ou demande client, reçue par WhatsApp, saisie ou poussée dans Le Radar.</div></div>
+  <div class="step"><div class="n">ÉTAPE 01</div><div class="t">Lead entrant</div><div class="d">Annonce propriétaire ou demande client, reçue sur le WhatsApp de l'agence affiché dans l'app, saisie ou poussée dans Le Radar.</div></div>
   <div class="step"><div class="n">ÉTAPE 02</div><div class="t">Qualification</div><div class="d">Aperçu du prix, de la surface, du quartier et de l'intention. Décision : publier ou rejeter.</div></div>
   <div class="step"><div class="n">ÉTAPE 03</div><div class="t">Bien au portefeuille</div><div class="d">Création de la fiche avec photos, vidéo, statut et référence BIEN-XXXX.</div></div>
   <div class="step"><div class="n">ÉTAPE 04</div><div class="t">Contrat</div><div class="d">Bail, mandat, engagement de vente ou compromis. Signature et archivage.</div></div>
@@ -791,6 +817,7 @@
   <div class="tags"><span class="tag cy">Leads</span><span class="tag">Zapier</span><span class="tag">WhatsApp</span><span class="tag am">Fonctionnel</span></div>
 </div>
 <p>Le Radar est le sas d'entrée des opportunités. Il distingue les annonces de propriétaires et les demandes de clients, majoritairement reçues par WhatsApp. Chaque lead est présenté comme une carte avec photo, type, intention location ou vente, prix, ville, surface et source. L'agent ouvre un aperçu, vérifie les informations, puis publie le bien au portefeuille ou rejette le lead.</p>
+<p><strong>Le flux cible.</strong> Le numéro WhatsApp de l'agence est affiché dans l'application. L'agent de terrain y envoie sa prospection ; un webhook Meta Cloud API transforme le message en lead dans Le Radar, avec les photos et les champs disponibles. L'agent qualifie, corrige si besoin, puis publie : le bien apparaît au portefeuille. C'est le seul flux qui crée automatiquement une donnée métier — tout le reste est saisi manuellement.</p>
 <div class="fig">
   <img src="assets/09-radar.jpg" alt="Le Radar — file de qualification des leads" />
   <div class="figcap"><span>Le Radar — annonces et demandes entrantes, actions de qualification.</span><span class="r">/radar</span></div>
@@ -810,7 +837,8 @@
   <div>
     <h4>Règles et limites</h4>
     <ul class="ticks">
-      <li>Les leads sont des constantes : aucun flux WhatsApp entrant réel.</li>
+      <li>Dans la version déployée, les leads sont des constantes : aucun flux WhatsApp entrant réel.</li>
+      <li>Cible : webhook Meta Cloud API sur le numéro de l'agence → lead → bien, avec téléversement des photos.</li>
       <li>La publication recopie les champs disponibles ; les photos restent des URLs.</li>
       <li>Le webhook ne fonctionne que si <span class="mono">VITE_ZAPIER_WEBHOOK_URL</span> est défini au build.</li>
       <li>Une clé de repli <span class="mono">movia-secret-2026</span> est présente dans le bundle : à retirer avant production.</li>
@@ -1355,6 +1383,9 @@ RewriteRule . /index.html [L]</div>
   <tbody>
     <tr><td><span class="tag ro">P0</span></td><td>État métier non persisté (biens, locataires, paiements, contrats, tickets)</td><td>Bloquant production</td><td>Couvert par la phase 1 (5–8 j)</td></tr>
     <tr><td><span class="tag ro">P0</span></td><td>Absence d'authentification et de rôles</td><td>Bloquant production</td><td>3–5 j</td></tr>
+    <tr><td><span class="tag ro">P0</span></td><td>Pas de manifeste ni de service worker : application non installable, pas de mode hors ligne</td><td>Bloquant terrain</td><td>2–3 j</td></tr>
+    <tr><td><span class="tag ro">P0</span></td><td>Aucun webhook WhatsApp entrant : les biens ne peuvent pas être créés depuis le terrain</td><td>Bloquant acquisition</td><td>3–4 j</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>Publication Zapier non branchée sur les biens publiés</td><td>Sortie manuelle</td><td>2 j</td></tr>
     <tr><td><span class="tag ro">P0</span></td><td>Données personnelles en clair dans le navigateur</td><td>Risque juridique</td><td>Inclus dans la migration</td></tr>
     <tr><td><span class="tag am">P1</span></td><td>Données de démonstration codées en dur dans les composants</td><td>Maintenance</td><td>2–3 j</td></tr>
     <tr><td><span class="tag am">P1</span></td><td>Adresse et équipements non persistés</td><td>Perte de donnée</td><td>0,5 j</td></tr>
@@ -1404,6 +1435,8 @@ RewriteRule . /index.html [L]</div>
 <table class="tbl compact">
   <thead><tr><th style="width:34%">Lot</th><th style="width:38%">Livrables</th><th>Critère d'acceptation</th></tr></thead>
   <tbody>
+    <tr><td>Installation locale (PWA)</td><td>Manifeste, service worker, cache applicatif, écran d'accueil, stockage local IndexedDB</td><td>L'app s'installe sur tablette et mobile et s'ouvre en plein écran, même hors ligne</td></tr>
+    <tr><td>Entrée WhatsApp des biens</td><td>Numéro de l'agence affiché dans l'app, webhook Meta Cloud API, création du bien depuis la prospection de l'agent</td><td>Un message envoyé au numéro de l'agence crée un bien dans Le Radar</td></tr>
     <tr><td>Authentification et rôles</td><td>Connexion, session, rôles admin / agent / gestionnaire, écran de profil réel</td><td>Un utilisateur non connecté ne voit aucun écran métier</td></tr>
     <tr><td>Base de données</td><td>PostgreSQL, schéma relationnel, Row Level Security, migrations</td><td>Les 8 entités sont persistées et cloisonnées par agence</td></tr>
     <tr><td>API applicative</td><td>Endpoints biens, locataires, paiements, contrats, tickets, leads</td><td>Les écrans lisent et écrivent via l'API, plus aucun état local métier</td></tr>
@@ -1417,7 +1450,7 @@ RewriteRule . /index.html [L]</div>
   <thead><tr><th style="width:34%">Lot</th><th style="width:38%">Livrables</th><th>Critère d'acceptation</th></tr></thead>
   <tbody>
     <tr><td>Vitrine publique</td><td>Site public généré depuis les biens publiés, SEO, partage social</td><td>Un bien publié apparaît en ligne sans double saisie</td></tr>
-    <tr><td>WhatsApp Business</td><td>Réception des messages et des leads via l'API Meta</td><td>Un message entrant crée un lead dans Le Radar</td></tr>
+    <tr><td>Publication Zapier</td><td>Zaps de publication vers portails, réseaux sociaux et vitrine</td><td>Un bien publié sort sans double saisie</td></tr>
     <tr><td>Campagnes et ROI</td><td>Coût par lead, source, taux de conversion, retour sur investissement</td><td>Le dirigeant connaît le coût d'acquisition par canal</td></tr>
     <tr><td>Notifications</td><td>E-mail et push : loyers en retard, contrats à renouveler, nouveau lead</td><td>Une alerte part dans les 5 minutes suivant l'événement</td></tr>
     <tr><td>Signature renforcée</td><td>Intégration d'un prestataire certifié, horodatage, piste d'audit</td><td>Le contrat produit une preuve vérifiable</td></tr>
@@ -1445,7 +1478,7 @@ RewriteRule . /index.html [L]</div>
     <tr><td><strong>Backend-as-a-service alternatif</strong><br /><span class="small muted">Firebase, Appwrite</span></td><td>Écosystème mature, temps réel</td><td>Modèle de données moins relationnel, coûts moins prévisibles</td><td><span class="tag">Possible, moins adapté au métier</span></td></tr>
   </tbody>
 </table>
-<div class="ok"><span class="t">Recommandation</span>Conserver le front React existant et le brancher sur Supabase (Auth, Postgres avec RLS, Storage). Cette trajectoire maximise la valeur déjà produite, minimise le risque et permet une mise en production en trois semaines.</div>
+<div class="ok"><span class="t">Recommandation</span>Conserver le front React existant et le brancher sur Supabase (Auth, Postgres avec RLS, Storage). Cette trajectoire maximise la valeur déjà produite, minimise le risque et permet une mise en production en trois semaines. Le socle doit également porter le manifeste PWA, le webhook WhatsApp entrant et les Zaps de publication.</div>
 
 <!-- ============================ 14 EXPLOITATION ============================ -->
 <h2 class="sec">14 · Exploitation et déploiement</h2>
@@ -1458,6 +1491,8 @@ RewriteRule . /index.html [L]</div>
 <table class="tbl compact">
   <tbody>
     <tr><td style="width:30%"><strong>Domaine</strong></td><td class="mono">immosolver.store</td></tr>
+    <tr><td><strong>Mode d'exploitation</strong></td><td>PWA installée localement sur la tablette ou le mobile de l'agent</td></tr>
+    <tr><td><strong>Entrées / sorties</strong></td><td>WhatsApp entrant (API Meta) pour les biens · Zapier sortant pour les publications</td></tr>
     <tr><td><strong>Type d'hébergement</strong></td><td>Hostinger — site statique (type « other »)</td></tr>
     <tr><td><strong>Racine serveur</strong></td><td class="mono">/home/u696346042/domains/immosolver.store/public_html</td></tr>
     <tr><td><strong>Compte</strong></td><td>u696346042 · commande 1008432763</td></tr>
@@ -1468,7 +1503,21 @@ RewriteRule . /index.html [L]</div>
   </tbody>
 </table>
 
-<h3><span class="n">14.2</span>Procédure de publication</h3>
+<h3><span class="n">14.2</span>Installation locale sur tablette et mobile</h3>
+<p>Le déploiement ne s'arrête pas au domaine : l'application doit s'installer sur l'appareil de chaque agent. La cible est une PWA installable, avec cache applicatif et stockage local, pour un usage en visite même sans réseau.</p>
+<table class="tbl compact">
+  <tbody>
+    <tr><td style="width:30%"><strong>Supports</strong></td><td>Tablette Android, iPad, téléphone Android / iOS</td></tr>
+    <tr><td><strong>Installation</strong></td><td>Ouverture de <span class="mono">immosolver.store</span> puis « Ajouter à l'écran d'accueil » — icône, nom, démarrage plein écran</td></tr>
+    <tr><td><strong>Stockage local</strong></td><td>IndexedDB pour les biens, photos et saisies en cours ; <span class="mono">localStorage</span> pour les préférences</td></tr>
+    <tr><td><strong>Mode hors ligne</strong></td><td>Service worker : l'app s'ouvre et les derniers écrans consultés restent disponibles</td></tr>
+    <tr><td><strong>Mise à jour</strong></td><td>Nouvelle version servie au lancement, activation après confirmation</td></tr>
+    <tr><td><strong>Sécurité de l'appareil</strong></td><td>Verrouillage système, code par agent, effacement à distance en cas de perte</td></tr>
+  </tbody>
+</table>
+<div class="warn"><span class="t">État actuel</span>Le build déployé n'expose ni manifeste ni service worker : l'installation locale et le stockage persistant font partie du lot « Installation locale (PWA) » de la phase 1 (13.1).</div>
+
+<h3><span class="n">14.3</span>Procédure de publication</h3>
 <ol class="ticks" style="padding-left:0">
   <li>Récupérer la version validée du dépôt <span class="mono">movia-glass-os</span>.</li>
   <li>Installer les dépendances : <span class="mono">npm ci</span>.</li>
@@ -1487,7 +1536,7 @@ curl -I https://immosolver.store/
 curl -I https://immosolver.store/portefeuille
 curl -I https://immosolver.store/descriptif/</div>
 
-<h3><span class="n">14.3</span>Sauvegarde et retour arrière</h3>
+<h3><span class="n">14.4</span>Sauvegarde et retour arrière</h3>
 <ul class="ticks">
   <li>Une copie de l'ancien contenu du domaine est conservée hors ligne avant chaque remplacement.</li>
   <li>Le déploiement statique écrase le contenu : ne jamais publier sans avoir identifié le domaine.</li>
@@ -1496,7 +1545,7 @@ curl -I https://immosolver.store/descriptif/</div>
 </ul>
 <div class="warn"><span class="t">Règle d'exploitation</span>Avant chaque déploiement : vérifier le domaine cible, archiver le contenu existant, déployer, puis contrôler les routes critiques. Un déploiement statique n'est pas réversible sans sauvegarde préalable.</div>
 
-<h3><span class="n">14.4</span>Supervision recommandée</h3>
+<h3><span class="n">14.5</span>Supervision recommandée</h3>
 <table class="tbl compact">
   <thead><tr><th style="width:26%">Besoin</th><th style="width:28%">Outil</th><th>Mise en œuvre</th></tr></thead>
   <tbody>
@@ -1508,7 +1557,7 @@ curl -I https://immosolver.store/descriptif/</div>
   </tbody>
 </table>
 
-<h3><span class="n">14.5</span>Checklist de mise en production réelle</h3>
+<h3><span class="n">14.6</span>Checklist de mise en production réelle</h3>
 <ul class="chk">
   <li>Authentification active et session obligatoire sur toutes les routes métier.</li>
   <li>Rôles et permissions vérifiés côté serveur, pas seulement dans l'interface.</li>
@@ -1522,7 +1571,23 @@ curl -I https://immosolver.store/descriptif/</div>
   <li>Procédure de retour arrière documentée et testée.</li>
   <li>Mentions légales, conditions d'utilisation et politique de confidentialité publiées.</li>
   <li>Formation des utilisateurs et support de premier niveau définis.</li>
+  <li>Application installée sur les tablettes et mobiles des agents, testée hors ligne.</li>
+  <li>Numéro WhatsApp de l'agence configuré et webhook Meta vérifié.</li>
+  <li>Zaps de publication testés vers chaque portail et réseau cible.</li>
 </ul>
+
+
+<h3><span class="n">14.7</span>Flux d'exploitation : WhatsApp entrant, Zapier sortant</h3>
+<table class="tbl compact">
+  <thead><tr><th style="width:6%">#</th><th style="width:24%">Étape</th><th style="width:24%">Canal</th><th>Résultat attendu</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Prospection terrain</td><td>WhatsApp de l'agence</td><td>L'agent envoie photos, adresse, surface, prix et contact au numéro affiché dans l'app</td></tr>
+    <tr><td>2</td><td>Création du bien</td><td>Webhook Meta Cloud API → Le Radar</td><td>Un lead puis un bien sont créés avec les champs disponibles ; l'agent complète si nécessaire</td></tr>
+    <tr><td>3</td><td>Saisie manuelle</td><td>Application</td><td>Locataires, paiements, contrats, maintenance et charges sont saisis par l'équipe</td></tr>
+    <tr><td>4</td><td>Publication</td><td>Zapier</td><td>Le bien validé part vers les portails, les réseaux sociaux et la vitrine, sans double saisie</td></tr>
+  </tbody>
+</table>
+<div class="callout"><span class="t">Règle de conception</span>Une seule entrée automatique — WhatsApp pour les biens — et une seule sortie automatique — Zapier pour les publications. Tout le reste est manuel : c'est ce qui garde le produit simple et prévisible.</div>
 
 <!-- ============================ 15 VIDEO ============================ -->
 <h2 class="sec">15 · Guide d'intégration de la vidéo</h2>
