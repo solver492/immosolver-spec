@@ -1,6 +1,6 @@
 # ImmoSolver — Spécification fonctionnelle & technique
 
-**CRM immobilier location & vente · Édition 2026 · v1.0**
+**CRM immobilier location & vente · Édition 2026 · v1.1**
 
 Document de référence du produit **ImmoSolver**, établi à partir du code source déployé (84 fichiers, 10 647 lignes) et de l'application en production. Il couvre la vision produit, les 10 modules fonctionnels, le modèle de données, l'architecture, le design system, la sécurité, l'audit de maturité, la feuille de route, l'exploitation et le guide d'intégration de la vidéo de démonstration.
 
@@ -8,10 +8,12 @@ Document de référence du produit **ImmoSolver**, établi à partir du code sou
 |---|---|
 | **Application déployée** | <https://immosolver.store/> |
 | **Dossier produit en ligne** | <https://immosolver.store/descriptif/> |
-| **PDF de la spécification** | [`spec.pdf`](./spec.pdf) — 43 pages, A4, 3,8 Mo |
+| **PDF de la spécification** | [`spec.pdf`](./spec.pdf) — 43 pages, A4, 4,6 Mo |
 | **Source imprimable** | [`spec.html`](./spec.html) — HTML + CSS d'impression |
 | **Captures** | [`assets/`](./assets) — 14 écrans de l'application |
-| **Date** | 5 novembre 2026 |
+| **Date** | 7 novembre 2026 |
+
+> **Nouveau en v1.1 — réception WhatsApp réelle.** Le Radar se connecte au WhatsApp de l'agence par QR code ou code d'appairage à 8 chiffres. Un service Node.js / Baileys dédié gère plusieurs connexions nommées, les agents de terrain, la réception du texte, des photos et des vidéos, l'extraction du prix et des détails, puis la validation des biens en location ou en vente. Voir la section 8.6 du PDF et le mode d'emploi sur <https://immosolver.store/descriptif/#whatsapp>.
 
 ---
 
@@ -97,7 +99,7 @@ Document de référence du produit **ImmoSolver**, établi à partir du code sou
 - Authentification, rôles, cloisonnement des données
 - Persistance serveur et travail multi-appareils
 - Vitrine publique (écran « Phase 2 » uniquement)
-- Réception réelle des messages WhatsApp via l'API Meta
+- Comptes multi-utilisateurs et rôles par agence pour le service WhatsApp (mono-clé aujourd'hui)
 - Quittances PDF, envoi de contrats par e-mail, signature qualifiée
 - Coût par lead, ROI publicitaire, attribution de campagne
 - Comptabilité, rapprochement bancaire, multi-agences
@@ -172,4 +174,4 @@ Les données visibles dans les captures et dans l'application sont des **donnée
 
 ---
 
-*Document établi le 5 novembre 2026 à partir du code source et de l'application déployée sur <https://immosolver.store/>.*
+*Document établi le 5 novembre 2026, mis à jour le 7 novembre 2026 avec l'intégration WhatsApp (v1.1), à partir du code source et de l'application déployée sur <https://immosolver.store/>.*

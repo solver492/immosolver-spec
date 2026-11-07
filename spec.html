@@ -225,8 +225,8 @@
   <div class="cover-rule"></div>
 
   <div class="cover-meta">
-    <div><div class="k">Version du document</div><div class="v">1.0 — finale</div></div>
-    <div><div class="k">Date</div><div class="v">5 novembre 2026</div></div>
+    <div><div class="k">Version du document</div><div class="v">1.1 — intégration WhatsApp</div></div>
+    <div><div class="k">Date</div><div class="v">7 novembre 2026</div></div>
     <div><div class="k">Application déployée</div><div class="v">https://immosolver.store/</div></div>
     <div><div class="k">Dossier produit</div><div class="v">https://immosolver.store/descriptif/</div></div>
     <div><div class="k">Périmètre</div><div class="v">Gestion locative et transaction vente — Maroc</div></div>
@@ -290,18 +290,18 @@
     <tr><td><strong>Marque exploitante</strong></td><td>IMMOSOLVER (sidebar et profil administrateur)</td></tr>
     <tr><td><strong>Nom du dossier et du domaine</strong></td><td>ImmoSolver — <span class="mono">immosolver.store</span></td></tr>
     <tr><td><strong>Mode d'exploitation</strong></td><td>Application installée localement sur la tablette ou le mobile de l'agent (PWA), utilisée en visite et en rendez-vous ; les données de travail restent sur l'appareil</td></tr>
-    <tr><td><strong>Entrée des biens</strong></td><td>WhatsApp : l'agent de terrain envoie sa prospection au numéro de l'agence affiché dans l'application ; le bien est créé dans l'app. Tous les autres modules sont alimentés par saisie manuelle</td></tr>
+    <tr><td><strong>Entrée des biens</strong></td><td>WhatsApp direct : le Radar se connecte au numéro de l'agence par QR code ou code à 8 chiffres ; les agents de terrain envoient texte, photos, vidéos, prix et détails. Le lead est validé en location ou en vente. Tous les autres modules sont alimentés par saisie manuelle</td></tr>
     <tr><td><strong>Sortie / diffusion</strong></td><td>Publication des annonces via Zapier — portails, réseaux sociaux et vitrine</td></tr>
-    <tr><td><strong>Nature</strong></td><td>Application web mono-page (SPA), 100 % front-end</td></tr>
+    <tr><td><strong>Nature</strong></td><td>Application web mono-page (SPA) + micro-service WhatsApp</td></tr>
     <tr><td><strong>Métier couvert</strong></td><td>Gestion locative, recouvrement des loyers, maintenance, transaction vente, qualification de leads</td></tr>
     <tr><td><strong>Marché cible</strong></td><td>Agences immobilières indépendantes au Maroc — jeu de données et zones centrés sur Tanger</td></tr>
     <tr><td><strong>Langues</strong></td><td>Français (défaut) et arabe, avec bascule complète en direction RTL</td></tr>
-    <tr><td><strong>Stack</strong></td><td>React 19.1 · TypeScript 5.8 · Vite 6.3 · TanStack Router 1.121 · Tailwind CSS 4.2 · Zustand 5 · Recharts 2.15 · FullCalendar 6.1</td></tr>
-    <tr><td><strong>Hébergement</strong></td><td>Hostinger — hébergement statique, HTTPS, domaine <span class="mono">immosolver.store</span></td></tr>
-    <tr><td><strong>Persistance</strong></td><td><span class="mono">localStorage</span> pour le mode, le thème et les notifications ; état métier en mémoire et store non persisté</td></tr>
+    <tr><td><strong>Stack</strong></td><td>React 19.1 · TypeScript 5.8 · Vite 6.3 · TanStack Router 1.121 · Tailwind CSS 4.2 · Zustand 5 · Recharts 2.15 · FullCalendar 6.1 · Node.js 22 · Express · Baileys 6.7</td></tr>
+    <tr><td><strong>Hébergement</strong></td><td>Hostinger — front statique <span class="mono">immosolver.store</span> · service Node.js <span class="mono">wa.immosolver.store</span> · HTTPS</td></tr>
+    <tr><td><strong>Persistance</strong></td><td><span class="mono">localStorage</span> pour le mode, le thème, les notifications et le portefeuille ; côté serveur, base JSON pour les instances WhatsApp, agents, leads et médias</td></tr>
     <tr><td><strong>Authentification</strong></td><td>Aucune — profil « Adil M. · Administrateur » décoratif</td></tr>
     <tr><td><strong>Base de données</strong></td><td>Aucune. Client Supabase généré mais importé nulle part</td></tr>
-    <tr><td><strong>Intégrations</strong></td><td>WhatsApp par liens <span class="mono">wa.me</span> (relances), webhook Zapier (publication), embeds YouTube / Vimeo, photos Unsplash (démonstration)</td></tr>
+    <tr><td><strong>Intégrations</strong></td><td>WhatsApp entrant via service Baileys (QR ou code à 8 chiffres), relances <span class="mono">wa.me</span>, webhook Zapier (publication), embeds YouTube / Vimeo, photos Unsplash (démonstration)</td></tr>
     <tr><td><strong>Volumétrie</strong></td><td>84 fichiers source · 10 647 lignes · 10 modules · 9 écrans · 46 composants d'interface</td></tr>
     <tr><td><strong>État</strong></td><td>Démonstrateur avancé et crédible — prêt pour la démonstration, non prêt pour une exploitation réelle sans socle serveur</td></tr>
   </tbody>
@@ -338,7 +338,7 @@
       <li>Authentification, rôles et cloisonnement des données.</li>
       <li>Persistance serveur, sauvegarde et travail multi-appareils.</li>
       <li>Vitrine publique : écran d'attente « Phase 2 » uniquement.</li>
-      <li>Réception automatique des messages WhatsApp (API Meta).</li>
+      <li>Comptes multi-utilisateurs et rôles par agence pour le service WhatsApp (mono-clé aujourd'hui).</li>
       <li>Quittances PDF, envoi de contrats par e-mail, signature qualifiée.</li>
       <li>Coût par lead, ROI publicitaire et attribution de campagne.</li>
       <li>Comptabilité, rapprochement bancaire, multi-agences.</li>
@@ -407,7 +407,7 @@
   <div class="card"><h4>Le geste avant l'écran</h4><p class="small">Chaque écran répond à une action concrète : publier un bien, relancer un loyer, signer un bail, clôturer un ticket.</p></div>
   <div class="card"><h4>La densité maîtrisée</h4><p class="small">Beaucoup d'information, mais une hiérarchie claire : indicateurs, puis liste, puis fiche. Jamais de tableau inextricable.</p></div>
   <div class="card"><h4>Le terrain d'abord</h4><p class="small">Zones réelles, MAD, CIN, WhatsApp, prénoms et usages marocains. Le produit n'est pas un template traduit.</p></div>
-  <div class="card"><h4>Zéro infrastructure</h4><p class="small">Un build statique, un CDN, un domaine. Coût d'exploitation quasi nul et déploiement en quelques secondes.</p></div>
+  <div class="card"><h4>Une seule brique serveur</h4><p class="small">Un build statique, un CDN, un domaine — et un micro-service Node.js dédié à WhatsApp. Coût d'exploitation quasi nul, déploiement en quelques secondes.</p></div>
   <div class="card"><h4>L'honnêteté produit</h4><p class="small">Les fonctions inachevées sont assumées : la vitrine annonce « Phase 2 », la signature n'est pas survendue comme qualifiée.</p></div>
 </div>
 
@@ -471,7 +471,7 @@
     <tr><td>05</td><td><strong>Paiements et impayés</strong></td><td class="mono">/paiements</td><td>Location</td><td><span class="tag em">Complet</span></td><td>Locataires, biens, WhatsApp</td></tr>
     <tr><td>06</td><td><strong>Contrats et signature</strong></td><td class="mono">/contrats</td><td>Les deux</td><td><span class="tag em">Complet</span></td><td>Biens, parties, signature canvas</td></tr>
     <tr><td>07</td><td><strong>Maintenance et charges</strong></td><td class="mono">/maintenance</td><td>Location</td><td><span class="tag em">Complet</span></td><td>Biens, prestataires</td></tr>
-    <tr><td>08</td><td><strong>Le Radar</strong></td><td class="mono">/radar</td><td>Partagé</td><td><span class="tag am">Fonctionnel</span></td><td>Portefeuille, Zapier</td></tr>
+    <tr><td>08</td><td><strong>Le Radar</strong></td><td class="mono">/radar</td><td>Partagé</td><td><span class="tag em">Complet</span></td><td>Portefeuille, WhatsApp, Zapier</td></tr>
     <tr><td>09</td><td><strong>Analytique et performance</strong></td><td class="mono">/analytique</td><td>Les deux</td><td><span class="tag am">Partiel</span></td><td>Données agrégées de démonstration</td></tr>
     <tr><td>10</td><td><strong>Système et navigation</strong></td><td>Transverse</td><td>Les deux</td><td><span class="tag em">Complet</span></td><td>i18n, thème, notifications</td></tr>
   </tbody>
@@ -813,11 +813,11 @@
 <div class="mod-head pb">
   <div class="id">MODULE 08</div>
   <h3>Le Radar</h3>
-  <div class="tagline">Transformer les messages en mandats</div>
-  <div class="tags"><span class="tag cy">Leads</span><span class="tag">Zapier</span><span class="tag">WhatsApp</span><span class="tag am">Fonctionnel</span></div>
+  <div class="tagline">Transformer les messages WhatsApp en mandats</div>
+  <div class="tags"><span class="tag cy">Leads</span><span class="tag">WhatsApp · Baileys</span><span class="tag">Zapier</span><span class="tag em">Complet</span></div>
 </div>
-<p>Le Radar est le sas d'entrée des opportunités. Il distingue les annonces de propriétaires et les demandes de clients, majoritairement reçues par WhatsApp. Chaque lead est présenté comme une carte avec photo, type, intention location ou vente, prix, ville, surface et source. L'agent ouvre un aperçu, vérifie les informations, puis publie le bien au portefeuille ou rejette le lead.</p>
-<p><strong>Le flux cible.</strong> Le numéro WhatsApp de l'agence est affiché dans l'application. L'agent de terrain y envoie sa prospection ; un webhook Meta Cloud API transforme le message en lead dans Le Radar, avec les photos et les champs disponibles. L'agent qualifie, corrige si besoin, puis publie : le bien apparaît au portefeuille. C'est le seul flux qui crée automatiquement une donnée métier — tout le reste est saisi manuellement.</p>
+<p>Le Radar est le sas d'entrée des opportunités. Les annonces de propriétaires et les demandes de clients arrivent directement depuis WhatsApp, sont qualifiées puis validées au portefeuille — en location ou en vente. Chaque lead est présenté comme une carte avec photo, type, intention, prix, ville, surface et source. L'agent ouvre un aperçu, vérifie les informations, puis valide la fiche.</p>
+<p><strong>Le flux livré.</strong> Le Radar se connecte au WhatsApp de l'agence par QR code ou code d'appairage à 8 chiffres. Un service Node.js / Baileys dédié maintient la ou les sessions, reçoit les messages privés, télécharge photos et vidéos, extrait prix, ville, surface et chambres, puis crée un lead. Les messages consécutifs d'un même agent sont regroupés sur trois minutes. À la validation, le bien et ses médias rejoignent le portefeuille Location ou Vente.</p>
 <div class="fig">
   <img src="assets/09-radar.jpg" alt="Le Radar — file de qualification des leads" />
   <div class="figcap"><span>Le Radar — annonces et demandes entrantes, actions de qualification.</span><span class="r">/radar</span></div>
@@ -826,26 +826,26 @@
   <div>
     <h4>Fonctions implémentées</h4>
     <ul class="ticks">
-      <li>Cartes lead : photo, titre, type, intention, prix, ville, surface, source.</li>
-      <li>Aperçu détaillé avant décision, avec description et métadonnées.</li>
-      <li>« Publier » crée le bien correspondant dans le portefeuille.</li>
-      <li>« Rejeter » retire le lead de la file avec toast de confirmation.</li>
+      <li>Connexions WhatsApp multiples et nommées : QR code ou code à 8 chiffres, numéro laissé libre.</li>
+      <li>Agents de terrain identifiés par numéro et rattachés à une connexion.</li>
+      <li>Réception en temps réel du texte, des photos et des vidéos ; extraction du prix, de la ville, de la surface et des chambres.</li>
+      <li>Regroupement des messages consécutifs d'un même agent sur trois minutes.</li>
+      <li>« Valider → Location » ou « Valider → Vente » crée la fiche avec ses médias ; « Rejeter » archive le lead.</li>
       <li>Webhook Zapier optionnel pour pousser les événements vers un automate.</li>
-      <li>Clé API de démonstration lue depuis les variables d'environnement.</li>
     </ul>
   </div>
   <div>
     <h4>Règles et limites</h4>
     <ul class="ticks">
-      <li>Dans la version déployée, les leads sont des constantes : aucun flux WhatsApp entrant réel.</li>
-      <li>Cible : webhook Meta Cloud API sur le numéro de l'agence → lead → bien, avec téléversement des photos.</li>
-      <li>La publication recopie les champs disponibles ; les photos restent des URLs.</li>
-      <li>Le webhook ne fonctionne que si <span class="mono">VITE_ZAPIER_WEBHOOK_URL</span> est défini au build.</li>
-      <li>Une clé de repli <span class="mono">movia-secret-2026</span> est présente dans le bundle : à retirer avant production.</li>
+      <li>Seules les conversations privées sont traitées ; les groupes WhatsApp sont ignorés.</li>
+      <li>Le code d'appairage expire après 90 secondes ; le QR reprend alors la main sans interrompre la session.</li>
+      <li>Le service est mono-utilisateur : clé API embarquée dans le front, pas encore de comptes par agence.</li>
+      <li>Sessions, agents, leads et médias sont persistés côté serveur ; à chiffrer et à purger en production.</li>
+      <li>Le webhook Zapier ne fonctionne que si <span class="mono">VITE_ZAPIER_WEBHOOK_URL</span> est défini au build.</li>
     </ul>
   </div>
 </div>
-<div class="verdict"><strong>Valeur :</strong> le Radar raconte parfaitement le flux « message → mandat ». C'est le module à montrer après le portefeuille pour expliquer d'où viennent les biens.</div>
+<div class="verdict"><strong>Valeur :</strong> le Radar couvre désormais le flux complet « message WhatsApp → bien validé » : c'est le module qui relie le terrain au portefeuille sans double saisie.</div>
 
 <!-- MODULE 09 -->
 <div class="mod-head pb">
@@ -929,7 +929,7 @@
   <thead><tr><th style="width:6%">#</th><th style="width:18%">Écran</th><th style="width:38%">Action</th><th>Résultat attendu</th></tr></thead>
   <tbody>
     <tr><td>1</td><td>Le Radar</td><td>Ouvrir un lead « Villa avec piscine — Cap Spartel »</td><td>L'aperçu affiche prix, surface, ville, intention et description</td></tr>
-    <tr><td>2</td><td>Le Radar</td><td>Vérifier la cohérence puis cliquer sur « Publier »</td><td>Le bien est créé au portefeuille avec une référence BIEN-XXXX</td></tr>
+    <tr><td>2</td><td>Le Radar</td><td>Vérifier la cohérence puis cliquer sur « Valider → Location » ou « Valider → Vente »</td><td>Le bien et ses médias sont créés au portefeuille avec une référence BIEN-XXXX</td></tr>
     <tr><td>3</td><td>Portefeuille</td><td>Enrichir la fiche : photos, description, statut</td><td>La fiche est complète et recherchable</td></tr>
     <tr><td>4</td><td>Contrats de vente</td><td>Créer un engagement de vente avec prix et commission</td><td>Le contrat apparaît en brouillon</td></tr>
     <tr><td>5</td><td>Contrats</td><td>Faire signer à l'écran puis archiver</td><td>Le statut passe à « Signé » et la signature est visible</td></tr>
@@ -1066,7 +1066,7 @@
 <h2 class="sec">08 · Architecture technique</h2>
 <div class="sec-head">
   <div class="sec-kicker">Comment c'est construit</div>
-  <div class="abstract">Une application front-end pure, compilée par Vite en fichiers statiques, servie par un CDN. Aucune API, aucune base, aucun serveur à maintenir — un choix assumé qui explique à la fois la vitesse du produit et ses limites.</div>
+  <div class="abstract">Une application front-end compilée par Vite en fichiers statiques, servie par un CDN, complétée par un micro-service Node.js dédié à WhatsApp. Le CRM n'a ni API ni base de données ; le service WhatsApp maintient les sessions Baileys, reçoit les biens et expose une API REST protégée par clé.</div>
 </div>
 
 <h3><span class="n">8.1</span>Vue en couches</h3>
@@ -1074,8 +1074,9 @@
   <div class="layer"><div class="k">Présentation</div><div class="v"><span class="pill hi">React 19</span><span class="pill">TanStack Router</span><span class="pill">Tailwind CSS 4</span><span class="pill">shadcn/ui (Radix)</span><span class="pill">Lucide</span><span class="pill">Recharts</span><span class="pill">FullCalendar</span><span class="pill">Sonner</span></div></div>
   <div class="layer"><div class="k">État</div><div class="v"><span class="pill wa">Zustand 5</span><span class="pill">persist (mode, thème, notifications)</span><span class="pill">useState local</span><span class="pill">localStorage</span></div></div>
   <div class="layer"><div class="k">Logique métier</div><div class="v"><span class="pill">Composants de route</span><span class="pill">Formulaires contrôlés</span><span class="pill">Réductions de totaux</span><span class="pill">Génération de références</span></div></div>
-  <div class="layer"><div class="k">Intégrations</div><div class="v"><span class="pill">WhatsApp wa.me</span><span class="pill wa">Zapier webhook</span><span class="pill">YouTube / Vimeo</span><span class="pill">Unsplash</span></div></div>
-  <div class="layer"><div class="k">Build &amp; diffusion</div><div class="v"><span class="pill">Vite 6</span><span class="pill">TypeScript 5.8</span><span class="pill">ESLint / Prettier</span><span class="pill hi">Hostinger statique</span><span class="pill">.htaccess SPA</span></div></div>
+  <div class="layer"><div class="k">Service WhatsApp</div><div class="v"><span class="pill hi">Node.js 22</span><span class="pill">Express</span><span class="pill">Baileys 6.7</span><span class="pill">Multi-instances</span><span class="pill">QR / code 8 chiffres</span><span class="pill">Médias</span><span class="pill">Base JSON</span></div></div>
+  <div class="layer"><div class="k">Intégrations</div><div class="v"><span class="pill">WhatsApp (service Baileys)</span><span class="pill wa">Zapier webhook</span><span class="pill">YouTube / Vimeo</span><span class="pill">Unsplash</span></div></div>
+  <div class="layer"><div class="k">Build &amp; diffusion</div><div class="v"><span class="pill">Vite 6</span><span class="pill">TypeScript 5.8</span><span class="pill">ESLint / Prettier</span><span class="pill hi">Hostinger front statique</span><span class="pill">Hostinger Node.js</span><span class="pill">.htaccess SPA</span></div></div>
 </div>
 
 <h3><span class="n">8.2</span>Stack et versions</h3>
@@ -1152,11 +1153,27 @@ RewriteRule . /index.html [L]</div>
     <tr><td>Poids CSS</td><td>140 Ko</td><td>Tailwind 4 génère uniquement les classes utilisées</td></tr>
     <tr><td>Découpage par route</td><td>Absent</td><td>Le premier chargement paie tout le produit</td></tr>
     <tr><td>Navigation interne</td><td>&lt; 1 s</td><td>Routage client, pas de rechargement réseau</td></tr>
-    <tr><td>Dépendance serveur</td><td>Aucune</td><td>Latence limitée au CDN Hostinger</td></tr>
+    <tr><td>Dépendance serveur</td><td>WhatsApp uniquement</td><td>Le CRM reste sans serveur ; le Radar appelle <span class="mono">wa.immosolver.store</span></td></tr>
     <tr><td>Cache</td><td>CDN + empreinte de fichier</td><td>Les assets sont versionnés par hash</td></tr>
   </tbody>
 </table>
 <div class="callout"><span class="t">Recommandation</span>Activer le découpage par route (<span class="mono">lazyRouteComponent</span>) et le préchargement des liens TanStack pour ramener le premier chargement sous 150 Ko compressés sur les écrans les plus consultés.</div>
+
+<h3><span class="n">8.6</span>Service WhatsApp</h3>
+<p>Le service est volontairement séparé du front : il tourne sur <span class="mono">wa.immosolver.store</span> et ne s'occupe que de WhatsApp. Il maintient les sockets Baileys, expose une API REST consommée par le Radar et persiste les sessions, agents, leads et médias dans un répertoire de données dédié.</p>
+<table class="tbl compact">
+  <thead><tr><th style="width:24%">Élément</th><th>Mise en œuvre</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Runtime</strong></td><td>Node.js 22 · Express · Baileys 6.7 · stockage JSON et fichiers</td></tr>
+    <tr><td><strong>Authentification</strong></td><td>Clé API <span class="mono">Bearer</span> obligatoire sur toutes les routes · CORS limité à <span class="mono">immosolver.store</span></td></tr>
+    <tr><td><strong>Connexions</strong></td><td>Instances multiples nommées · QR code ou code d'appairage à 8 chiffres sur la socket déjà ouverte · code expiré après 90 s · retour au QR sans redémarrage</td></tr>
+    <tr><td><strong>Réception</strong></td><td>Messages privés uniquement · texte, photos, vidéos · extraction prix, ville, surface, chambres · regroupement des messages d'un même agent sur 3 minutes</td></tr>
+    <tr><td><strong>Validation</strong></td><td><span class="mono">POST /api/leads/:id/approve</span> avec <span class="mono">dealType</span> location ou vente · <span class="mono">/reject</span> pour archiver</td></tr>
+    <tr><td><strong>Données</strong></td><td><span class="mono">DATA_DIR/auth/&lt;instanceId&gt;</span> · <span class="mono">DATA_DIR/media</span> · <span class="mono">DATA_DIR/db.json</span></td></tr>
+    <tr><td><strong>Exploitation</strong></td><td>Cron <span class="mono">/health</span> toutes les 5 minutes · reconnexion Baileys au réveil · redémarrage Hostinger documenté</td></tr>
+  </tbody>
+</table>
+<div class="warn"><span class="t">Limites connues</span>Le service est mono-agence : une clé API embarquée dans le bundle front, pas de comptes ni de rôles. Les sessions et les médias ne sont pas chiffrés au repos. Une veille de l'hébergement mutualisé peut mettre le service en sommeil : le cron de ping et la reconnexion automatique limitent l'impact.</div>
 
 <!-- ============================ 09 DESIGN ============================ -->
 <h2 class="sec">09 · Design system</h2>
@@ -1364,16 +1381,16 @@ RewriteRule . /index.html [L]</div>
     <tr><td><strong>Paiements</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Statuts, totaux, relance WhatsApp, modes</td><td>Quittances PDF, rapprochement bancaire, source unique locataire</td></tr>
     <tr><td><strong>Contrats</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>4 types, signature, aperçu, cycle de vie</td><td>Envoi e-mail, signature qualifiée, modèles juridiques validés</td></tr>
     <tr><td><strong>Maintenance</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Tickets, priorités, coûts, rappels de charges</td><td>Photos, devis, planning prestataire, lien comptable</td></tr>
-    <tr><td><strong>Le Radar</strong></td><td><strong>3,5 / 5</strong></td><td><span class="tag am">Fonctionnel</span></td><td>Qualification, publication, rejet, webhook</td><td>Flux WhatsApp réel, scoring, doublons</td></tr>
+    <tr><td><strong>Le Radar</strong></td><td><strong>4,5 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Connexions QR/code, agents, médias, validation Location/Vente, rejet, webhook</td><td>Scoring, doublons, comptes multi-utilisateurs</td></tr>
     <tr><td><strong>Analytique</strong></td><td><strong>2 / 5</strong></td><td><span class="tag am">Partiel</span></td><td>Deux visualisations soignées, intention claire</td><td>Agrégations réelles, ROI, exports, filtres</td></tr>
     <tr><td><strong>Système</strong></td><td><strong>4 / 5</strong></td><td><span class="tag em">Complet</span></td><td>Navigation, FR/AR, RTL, thème, notifications</td><td>Authentification, rôles, multi-agences</td></tr>
   </tbody>
 </table>
 
 <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
-  <div class="kpi"><div class="n">3,7<span style="font-size:9pt">/5</span></div><div class="l">maturité fonctionnelle moyenne</div></div>
+  <div class="kpi"><div class="n">3,9<span style="font-size:9pt">/5</span></div><div class="l">maturité fonctionnelle moyenne</div></div>
   <div class="kpi"><div class="n">8<span style="font-size:9pt">/10</span></div><div class="l">modules utilisables en démonstration</div></div>
-  <div class="kpi"><div class="n">0<span style="font-size:9pt">/10</span></div><div class="l">modules persistés côté serveur</div></div>
+  <div class="kpi"><div class="n">1<span style="font-size:9pt">/10</span></div><div class="l">modules persistés côté serveur (Radar)</div></div>
   <div class="kpi"><div class="n">2<span style="font-size:9pt">/10</span></div><div class="l">modules avec données réellement calculées</div></div>
 </div>
 
@@ -1384,7 +1401,7 @@ RewriteRule . /index.html [L]</div>
     <tr><td><span class="tag ro">P0</span></td><td>État métier non persisté (biens, locataires, paiements, contrats, tickets)</td><td>Bloquant production</td><td>Couvert par la phase 1 (5–8 j)</td></tr>
     <tr><td><span class="tag ro">P0</span></td><td>Absence d'authentification et de rôles</td><td>Bloquant production</td><td>3–5 j</td></tr>
     <tr><td><span class="tag ro">P0</span></td><td>Pas de manifeste ni de service worker : application non installable, pas de mode hors ligne</td><td>Bloquant terrain</td><td>2–3 j</td></tr>
-    <tr><td><span class="tag ro">P0</span></td><td>Aucun webhook WhatsApp entrant : les biens ne peuvent pas être créés depuis le terrain</td><td>Bloquant acquisition</td><td>3–4 j</td></tr>
+    <tr><td><span class="tag am">P1</span></td><td>Service WhatsApp mono-clé, sessions et médias non chiffrés</td><td>Sécurité / multi-agence</td><td>2–3 j</td></tr>
     <tr><td><span class="tag am">P1</span></td><td>Publication Zapier non branchée sur les biens publiés</td><td>Sortie manuelle</td><td>2 j</td></tr>
     <tr><td><span class="tag ro">P0</span></td><td>Données personnelles en clair dans le navigateur</td><td>Risque juridique</td><td>Inclus dans la migration</td></tr>
     <tr><td><span class="tag am">P1</span></td><td>Données de démonstration codées en dur dans les composants</td><td>Maintenance</td><td>2–3 j</td></tr>
@@ -1436,7 +1453,7 @@ RewriteRule . /index.html [L]</div>
   <thead><tr><th style="width:34%">Lot</th><th style="width:38%">Livrables</th><th>Critère d'acceptation</th></tr></thead>
   <tbody>
     <tr><td>Installation locale (PWA)</td><td>Manifeste, service worker, cache applicatif, écran d'accueil, stockage local IndexedDB</td><td>L'app s'installe sur tablette et mobile et s'ouvre en plein écran, même hors ligne</td></tr>
-    <tr><td>Entrée WhatsApp des biens</td><td>Numéro de l'agence affiché dans l'app, webhook Meta Cloud API, création du bien depuis la prospection de l'agent</td><td>Un message envoyé au numéro de l'agence crée un bien dans Le Radar</td></tr>
+    <tr><td>Consolidation du service WhatsApp <span class="tag em">livré</span></td><td>Connexions QR / code à 8 chiffres, agents de terrain, médias, validation Location/Vente. Reste : comptes multi-utilisateurs et chiffrement</td><td>Un message envoyé par un agent crée un bien dans Le Radar</td></tr>
     <tr><td>Authentification et rôles</td><td>Connexion, session, rôles admin / agent / gestionnaire, écran de profil réel</td><td>Un utilisateur non connecté ne voit aucun écran métier</td></tr>
     <tr><td>Base de données</td><td>PostgreSQL, schéma relationnel, Row Level Security, migrations</td><td>Les 8 entités sont persistées et cloisonnées par agence</td></tr>
     <tr><td>API applicative</td><td>Endpoints biens, locataires, paiements, contrats, tickets, leads</td><td>Les écrans lisent et écrivent via l'API, plus aucun état local métier</td></tr>
@@ -1484,7 +1501,7 @@ RewriteRule . /index.html [L]</div>
 <h2 class="sec">14 · Exploitation et déploiement</h2>
 <div class="sec-head">
   <div class="sec-kicker">Faire tourner le produit</div>
-  <div class="abstract">Un hébergement statique, un domaine, une procédure de publication en quatre commandes et aucune infrastructure à superviser. C'est la force de l'architecture actuelle.</div>
+  <div class="abstract">Un hébergement statique, un domaine, une procédure de publication en quatre commandes — et un micro-service WhatsApp à surveiller. C'est le prix de l'entrée automatique des biens.</div>
 </div>
 
 <h3><span class="n">14.1</span>Environnement de production</h3>
@@ -1492,14 +1509,14 @@ RewriteRule . /index.html [L]</div>
   <tbody>
     <tr><td style="width:30%"><strong>Domaine</strong></td><td class="mono">immosolver.store</td></tr>
     <tr><td><strong>Mode d'exploitation</strong></td><td>PWA installée localement sur la tablette ou le mobile de l'agent</td></tr>
-    <tr><td><strong>Entrées / sorties</strong></td><td>WhatsApp entrant (API Meta) pour les biens · Zapier sortant pour les publications</td></tr>
-    <tr><td><strong>Type d'hébergement</strong></td><td>Hostinger — site statique (type « other »)</td></tr>
+    <tr><td><strong>Entrées / sorties</strong></td><td>WhatsApp entrant (service Baileys) pour les biens · Zapier sortant pour les publications</td></tr>
+    <tr><td><strong>Type d'hébergement</strong></td><td>Hostinger — front statique <span class="mono">immosolver.store</span> · service Node.js <span class="mono">wa.immosolver.store</span></td></tr>
     <tr><td><strong>Racine serveur</strong></td><td class="mono">/home/u696346042/domains/immosolver.store/public_html</td></tr>
     <tr><td><strong>Compte</strong></td><td>u696346042 · commande 1008432763</td></tr>
     <tr><td><strong>HTTPS</strong></td><td>Actif, certificat géré par l'hébergeur</td></tr>
     <tr><td><strong>Assets</strong></td><td>Servis par le CDN Hostinger, empreinte de fichier</td></tr>
     <tr><td><strong>Repli SPA</strong></td><td class="mono">.htaccess</td></tr>
-    <tr><td><strong>Coût récurrent</strong></td><td>Domaine ≈ 120 MAD/an · hébergement mutualisé déjà en compte · 0 serveur</td></tr>
+    <tr><td><strong>Coût récurrent</strong></td><td>Domaine ≈ 120 MAD/an · hébergement mutualisé déjà en compte · micro-service inclus</td></tr>
   </tbody>
 </table>
 
@@ -1572,7 +1589,7 @@ curl -I https://immosolver.store/descriptif/</div>
   <li>Mentions légales, conditions d'utilisation et politique de confidentialité publiées.</li>
   <li>Formation des utilisateurs et support de premier niveau définis.</li>
   <li>Application installée sur les tablettes et mobiles des agents, testée hors ligne.</li>
-  <li>Numéro WhatsApp de l'agence configuré et webhook Meta vérifié.</li>
+  <li>Service WhatsApp connecté (QR ou code à 8 chiffres), agents de terrain créés et testés.</li>
   <li>Zaps de publication testés vers chaque portail et réseau cible.</li>
 </ul>
 
@@ -1582,7 +1599,7 @@ curl -I https://immosolver.store/descriptif/</div>
   <thead><tr><th style="width:6%">#</th><th style="width:24%">Étape</th><th style="width:24%">Canal</th><th>Résultat attendu</th></tr></thead>
   <tbody>
     <tr><td>1</td><td>Prospection terrain</td><td>WhatsApp de l'agence</td><td>L'agent envoie photos, adresse, surface, prix et contact au numéro affiché dans l'app</td></tr>
-    <tr><td>2</td><td>Création du bien</td><td>Webhook Meta Cloud API → Le Radar</td><td>Un lead puis un bien sont créés avec les champs disponibles ; l'agent complète si nécessaire</td></tr>
+    <tr><td>2</td><td>Création du bien</td><td>Service WhatsApp (Baileys) → Le Radar</td><td>Un lead est créé avec le texte, les médias, le prix et les détails ; l'agent complète puis valide</td></tr>
     <tr><td>3</td><td>Saisie manuelle</td><td>Application</td><td>Locataires, paiements, contrats, maintenance et charges sont saisis par l'équipe</td></tr>
     <tr><td>4</td><td>Publication</td><td>Zapier</td><td>Le bien validé part vers les portails, les réseaux sociaux et la vitrine, sans double saisie</td></tr>
   </tbody>
@@ -1641,7 +1658,7 @@ curl -I https://immosolver.store/descriptif/</div>
     <tr><td class="mono">0:52–1:06</td><td>Paiements</td><td>Ouverture d'un impayé, clic WhatsApp</td><td>Le loyer en retard devient une action immédiate.</td></tr>
     <tr><td class="mono">1:06–1:22</td><td>Contrats</td><td>Ouverture d'un bail, signature au stylet</td><td>Le contrat se signe sans imprimante.</td></tr>
     <tr><td class="mono">1:22–1:34</td><td>Maintenance</td><td>Création d'un ticket, priorité haute</td><td>Chaque incident est tracé, chiffré, suivi.</td></tr>
-    <tr><td class="mono">1:34–1:48</td><td>Le Radar</td><td>Aperçu d'un lead, clic « Publier »</td><td>Un message WhatsApp devient un bien au portefeuille.</td></tr>
+    <tr><td class="mono">1:34–1:48</td><td>Le Radar</td><td>Aperçu d'un lead, clic « Valider → Location »</td><td>Un message WhatsApp devient un bien au portefeuille.</td></tr>
     <tr><td class="mono">1:48–2:00</td><td>Mode vente</td><td>Bascule locatif → vente</td><td>Un seul outil pour les deux métiers.</td></tr>
     <tr><td class="mono">2:00–2:12</td><td>Version arabe</td><td>Bascule FR → AR, interface en RTL</td><td>Pensé pour le marché marocain, jusqu'à la direction de lecture.</td></tr>
     <tr><td class="mono">2:12–2:22</td><td>Mobile</td><td>Vue 430 px, navigation compacte</td><td>Utilisable en visite, depuis le téléphone.</td></tr>
@@ -1693,7 +1710,7 @@ curl -I https://immosolver.store/descriptif/</div>
     <tr><td class="mono">/contrats</td><td>Contrats</td><td>Les deux</td><td>Baux, mandats, engagements, compromis, signature</td></tr>
     <tr><td class="mono">/maintenance</td><td>Maintenance</td><td>Location</td><td>Tickets, priorités, charges</td></tr>
     <tr><td class="mono">/analytique</td><td>Analytique</td><td>Les deux</td><td>Revenus, occupation, performance</td></tr>
-    <tr><td class="mono">/radar</td><td>Le Radar</td><td>Partagé</td><td>Leads, qualification, publication</td></tr>
+    <tr><td class="mono">/radar</td><td>Le Radar</td><td>Partagé</td><td>Leads, qualification, validation Location/Vente</td></tr>
     <tr><td class="mono">/vitrine</td><td>Vitrine publique</td><td>Partagé</td><td>Écran d'attente « Phase 2 »</td></tr>
   </tbody>
 </table>
@@ -1762,8 +1779,8 @@ curl -I https://immosolver.store/descriptif/</div>
     <tr><td><strong>Application de référence</strong></td><td><span class="mono">https://immosolver.store/</span> — version déployée le 5 novembre 2026</td></tr>
     <tr><td><strong>Méthode</strong></td><td>Lecture du code, exécution des parcours, captures sur l'application en production</td></tr>
     <tr><td><strong>Captures</strong></td><td>14 écrans, 1600 × 1000 (desktop) et 430 × 932 (mobile)</td></tr>
-    <tr><td><strong>Version</strong></td><td>1.0 — finale</td></tr>
-    <tr><td><strong>Date</strong></td><td>5 novembre 2026</td></tr>
+    <tr><td><strong>Version</strong></td><td>1.1 — intégration WhatsApp</td></tr>
+    <tr><td><strong>Date</strong></td><td>7 novembre 2026</td></tr>
     <tr><td><strong>Diffusion</strong></td><td>Interne — direction, produit, développement, production vidéo</td></tr>
   </tbody>
 </table>
@@ -1774,7 +1791,7 @@ curl -I https://immosolver.store/descriptif/</div>
 </div>
 
 <div style="margin-top:26px; border-top:2px solid #e3eaf3; padding-top:14px" class="small muted">
-  <strong style="color:#0b1b33">ImmoSolver — Spécification fonctionnelle et technique · v1.0 · 5 novembre 2026.</strong><br />
+  <strong style="color:#0b1b33">ImmoSolver — Spécification fonctionnelle et technique · v1.1 · 7 novembre 2026.</strong><br />
   Application : https://immosolver.store/ · Dossier produit : https://immosolver.store/descriptif/ · Dépôt de la spécification : https://github.com/solver492/immosolver-spec<br />
   Document établi à partir du code source et de l'application déployée. Les données affichées dans les captures sont des données de démonstration.
 </div>
